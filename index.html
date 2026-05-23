@@ -200,13 +200,13 @@ canvas{max-width:100%;display:block}
   <button class="nav-btn" onclick="showTab('steuer')">Steuerliche Betrachtung</button>
   <button class="nav-btn" onclick="showTab('bewertung')">Objektbewertung</button>
   <button class="nav-btn" onclick="showTab('geg')">GEG-Konformität</button>
+  <button class="nav-btn" onclick="showTab('vergleich')" style="border-color:var(--amber);color:var(--amber)">⇄ Variantenvergleich</button>
   <button class="nav-btn" id="ki-tab-btn" onclick="showTab('ki')" style="background:linear-gradient(135deg,#0a6147,#1458a0);color:#fff;border-color:transparent">✦ KI-Analyse</button>
 </div>
 
 <!-- ═══════════════════ TAB 1: EINGABE ═══════════════════ -->
 <div id="tab-eingabe" class="tab-page active">
 <div id="validation-banner"></div>
-<div id="tab-eingabe" class="tab-page active">
 <div class="grid2">
 
   <div>
@@ -490,6 +490,159 @@ canvas{max-width:100%;display:block}
       </div>
     </div>
   </div>
+</div>
+
+<!-- ═══════════════════ TAB: VARIANTENVERGLEICH ═══════════════════ -->
+<div id="tab-vergleich" class="tab-page">
+
+  <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:15px;font-weight:500;color:var(--text)">Variantenvergleich</div>
+      <div style="font-size:12px;color:var(--text2)">Bis zu 3 Modernisierungsvarianten nebeneinander vergleichen</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-outline" onclick="vgl_importCurrent()" style="font-size:12px">⬇ Aktuelle Eingabe als Variante A übernehmen</button>
+      <button class="btn-outline" onclick="vgl_reset()" style="font-size:12px;color:var(--red);border-color:var(--red)">Vergleich zurücksetzen</button>
+    </div>
+  </div>
+
+  <!-- VARIANTEN-EINGABE -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:16px" id="vgl-inputs">
+
+    <!-- VARIANTE A -->
+    <div class="panel" style="border-top:3px solid var(--green)">
+      <div class="panel-head" style="background:var(--green-bg);color:var(--green)">Variante A</div>
+      <div class="panel-body">
+        <div class="section-label">Bezeichnung</div>
+        <input type="text" id="vA-name" value="Vollsanierung" onchange="vgl_calc()" style="height:30px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none;margin-bottom:8px">
+        <div class="section-label">Investitionskosten</div>
+        <div class="field-row">
+          <div class="field"><label>Dach <span class="unit">€</span></label><input type="number" id="vA-dach" value="45000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Fassade <span class="unit">€</span></label><input type="number" id="vA-fassade" value="80000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Fenster <span class="unit">€</span></label><input type="number" id="vA-fenster" value="60000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Heizung <span class="unit">€</span></label><input type="number" id="vA-heizung" value="55000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Lüftung <span class="unit">€</span></label><input type="number" id="vA-lueftung" value="20000" onchange="vgl_calc()"></div>
+          <div class="field"><label>PV <span class="unit">€</span></label><input type="number" id="vA-pv" value="30000" onchange="vgl_calc()"></div>
+        </div>
+        <div class="section-label">Energetisch</div>
+        <div class="field-row">
+          <div class="field"><label>Vorher <span class="unit">kWh/m²</span></label><input type="number" id="vA-vorher" value="180" onchange="vgl_calc()"></div>
+          <div class="field"><label>Nachher <span class="unit">kWh/m²</span></label><input type="number" id="vA-nachher" value="45" onchange="vgl_calc()"></div>
+        </div>
+        <div class="section-label">Förderung</div>
+        <div class="field-row">
+          <div class="field"><label>KfW <span class="unit">%</span></label><input type="number" id="vA-kfw" value="25" onchange="vgl_calc()"></div>
+          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="vA-bafa" value="8000" onchange="vgl_calc()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANTE B -->
+    <div class="panel" style="border-top:3px solid var(--blue)">
+      <div class="panel-head" style="background:var(--blue-bg);color:var(--blue)">Variante B</div>
+      <div class="panel-body">
+        <div class="section-label">Bezeichnung</div>
+        <input type="text" id="vB-name" value="Teilsanierung" onchange="vgl_calc()" style="height:30px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none;margin-bottom:8px">
+        <div class="section-label">Investitionskosten</div>
+        <div class="field-row">
+          <div class="field"><label>Dach <span class="unit">€</span></label><input type="number" id="vB-dach" value="45000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Fassade <span class="unit">€</span></label><input type="number" id="vB-fassade" value="0" onchange="vgl_calc()"></div>
+          <div class="field"><label>Fenster <span class="unit">€</span></label><input type="number" id="vB-fenster" value="60000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Heizung <span class="unit">€</span></label><input type="number" id="vB-heizung" value="55000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Lüftung <span class="unit">€</span></label><input type="number" id="vB-lueftung" value="0" onchange="vgl_calc()"></div>
+          <div class="field"><label>PV <span class="unit">€</span></label><input type="number" id="vB-pv" value="0" onchange="vgl_calc()"></div>
+        </div>
+        <div class="section-label">Energetisch</div>
+        <div class="field-row">
+          <div class="field"><label>Vorher <span class="unit">kWh/m²</span></label><input type="number" id="vB-vorher" value="180" onchange="vgl_calc()"></div>
+          <div class="field"><label>Nachher <span class="unit">kWh/m²</span></label><input type="number" id="vB-nachher" value="90" onchange="vgl_calc()"></div>
+        </div>
+        <div class="section-label">Förderung</div>
+        <div class="field-row">
+          <div class="field"><label>KfW <span class="unit">%</span></label><input type="number" id="vB-kfw" value="20" onchange="vgl_calc()"></div>
+          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="vB-bafa" value="5000" onchange="vgl_calc()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANTE C -->
+    <div class="panel" style="border-top:3px solid var(--amber)">
+      <div class="panel-head" style="background:var(--amber-bg);color:var(--amber)">Variante C</div>
+      <div class="panel-body">
+        <div class="section-label">Bezeichnung</div>
+        <input type="text" id="vC-name" value="Nur Heizung" onchange="vgl_calc()" style="height:30px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none;margin-bottom:8px">
+        <div class="section-label">Investitionskosten</div>
+        <div class="field-row">
+          <div class="field"><label>Dach <span class="unit">€</span></label><input type="number" id="vC-dach" value="0" onchange="vgl_calc()"></div>
+          <div class="field"><label>Fassade <span class="unit">€</span></label><input type="number" id="vC-fassade" value="0" onchange="vgl_calc()"></div>
+          <div class="field"><label>Fenster <span class="unit">€</span></label><input type="number" id="vC-fenster" value="0" onchange="vgl_calc()"></div>
+          <div class="field"><label>Heizung <span class="unit">€</span></label><input type="number" id="vC-heizung" value="55000" onchange="vgl_calc()"></div>
+          <div class="field"><label>Lüftung <span class="unit">€</span></label><input type="number" id="vC-lueftung" value="0" onchange="vgl_calc()"></div>
+          <div class="field"><label>PV <span class="unit">€</span></label><input type="number" id="vC-pv" value="0" onchange="vgl_calc()"></div>
+        </div>
+        <div class="section-label">Energetisch</div>
+        <div class="field-row">
+          <div class="field"><label>Vorher <span class="unit">kWh/m²</span></label><input type="number" id="vC-vorher" value="180" onchange="vgl_calc()"></div>
+          <div class="field"><label>Nachher <span class="unit">kWh/m²</span></label><input type="number" id="vC-nachher" value="130" onchange="vgl_calc()"></div>
+        </div>
+        <div class="section-label">Förderung</div>
+        <div class="field-row">
+          <div class="field"><label>KfW <span class="unit">%</span></label><input type="number" id="vC-kfw" value="15" onchange="vgl_calc()"></div>
+          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="vC-bafa" value="3000" onchange="vgl_calc()"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GEMEINSAME PARAMETER -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-head">Gemeinsame Projektparameter</div>
+    <div class="panel-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+        <div class="field"><label>Wohnfläche <span class="unit">m²</span></label><input type="number" id="vgl-fl" value="800" onchange="vgl_calc()"></div>
+        <div class="field"><label>Energiepreis <span class="unit">€/kWh</span></label><input type="number" id="vgl-ep" value="0.12" step="0.01" onchange="vgl_calc()"></div>
+        <div class="field"><label>Preissteigerung <span class="unit">%/a</span></label><input type="number" id="vgl-es" value="3" onchange="vgl_calc()"></div>
+        <div class="field"><label>Kaltmiete <span class="unit">€/m²</span></label><input type="number" id="vgl-miete" value="8.50" step="0.1" onchange="vgl_calc()"></div>
+        <div class="field"><label>Zinssatz <span class="unit">%</span></label><input type="number" id="vgl-zins" value="3.5" step="0.1" onchange="vgl_calc()"></div>
+        <div class="field"><label>Eigenkapital <span class="unit">€</span></label><input type="number" id="vgl-ek" value="100000" onchange="vgl_calc()"></div>
+        <div class="field"><label>Tilgung <span class="unit">%</span></label><input type="number" id="vgl-tilg" value="2" onchange="vgl_calc()"></div>
+        <div class="field"><label>Laufzeit <span class="unit">Jahre</span></label><input type="number" id="vgl-lz" value="20" onchange="vgl_calc()"></div>
+        <div class="field"><label>Nebenkosten <span class="unit">%</span></label><input type="number" id="vgl-nk" value="12" onchange="vgl_calc()"></div>
+        <div class="field"><label>Leerstand <span class="unit">%</span></label><input type="number" id="vgl-leer" value="3" onchange="vgl_calc()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERGEBNIS-VERGLEICH -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-head" style="background:var(--navy,#1a1a17);color:#fff">
+      Vergleichsergebnisse
+      <span style="margin-left:auto;font-size:11px;opacity:.6" id="vgl-winner-badge"></span>
+    </div>
+    <div class="panel-body" style="overflow-x:auto">
+      <table class="data-table" id="vgl-table" style="min-width:500px">
+        <thead>
+          <tr>
+            <th style="text-align:left">Kennzahl</th>
+            <th id="vgl-th-A" style="color:var(--green)">Variante A</th>
+            <th id="vgl-th-B" style="color:var(--blue)">Variante B</th>
+            <th id="vgl-th-C" style="color:var(--amber)">Variante C</th>
+          </tr>
+        </thead>
+        <tbody id="vgl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BALKEN-CHART -->
+  <div class="panel">
+    <div class="panel-head">Visueller Vergleich</div>
+    <div class="panel-body">
+      <div id="vgl-bars"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ═══════════════════ TAB 6: KI-ANALYSE ═══════════════════ -->
@@ -1020,10 +1173,13 @@ function calcBewertung(){
 
 // ── GEG ──
 function calcGEG(){
-  const vor=S.vor||v('vorher'),nach=S.nach||v('nachher');
+  const vor=S.vor||v('vorher')||0;
+  const nach=S.nach||v('nachher')||0;
+  const fl=S.fl||v('flaeche')||0;
+  if(!vor||!nach||!fl) return;
   const bj=v('baujahr');
-  const co2Vor=vor*(S.fl||v('flaeche'))*0.201/1000;
-  const co2Nach=nach*(S.fl||v('flaeche'))*0.201/1000;
+  const co2Vor=vor*fl*0.201/1000;
+  const co2Nach=nach*fl*0.201/1000;
 
   g('geg-co2-heute').textContent=eur(co2Vor*45);
   g('geg-co2-2030').textContent=eur(co2Vor*200);
@@ -1073,6 +1229,7 @@ function showTab(id,evtOverride){
   if(id==='steuer')setTimeout(calcSteuer,50);
   if(id==='bewertung')calcBewertung();
   if(id==='geg')calcGEG();
+  if(id==='vergleich')setTimeout(vgl_calc,50);
   if(id==='einstellungen'){updateSettingsLicense();renderProjectList();updateStorageInfo();}
 }
 
@@ -1313,12 +1470,63 @@ function activateLicense(){
   updateSettingsLicense();
 }
 
+const TRIAL_MAX_PROJECTS = 3;
+
+function isTrialLimited(){
+  const lic=getLicense();
+  if(!lic) return true;
+  return lic.key==='TRIAL';
+}
+
+function getTrialProjectCount(){
+  return getAllProjects().length;
+}
+
+function showTrialUpgradeOverlay(){
+  const overlay=document.createElement('div');
+  overlay.id='trial-upgrade-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(10,15,20,0.85);z-index:9998;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease';
+  overlay.innerHTML=`
+    <div style="background:#fff;border-radius:16px;padding:36px 40px;max-width:460px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:6px">Testphase — Limit erreicht</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:10px">3 Projekte gespeichert</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">
+        In der kostenlosen Testphase können Sie bis zu <strong>3 Projekte</strong> speichern.<br>
+        Mit einer Lizenz erhalten Sie unbegrenzte Projekte, alle Module und den vollständigen PDF-Export.
+      </div>
+      <div style="background:var(--green-bg);border-radius:var(--r);padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:6px">SMART CapEx — Einzellizenz</div>
+        <div style="font-size:26px;font-weight:700;color:var(--green);line-height:1">189 €</div>
+        <div style="font-size:12px;color:var(--green);opacity:.8">pro Jahr · unbegrenzte Projekte · alle Module</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="document.getElementById('trial-upgrade-overlay').remove()" style="flex:1;height:38px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);font-size:13px;cursor:pointer">Schließen</button>
+        <button onclick="window.open('https://www.built-smart-hub.com','_blank');document.getElementById('trial-upgrade-overlay').remove()" style="flex:2;height:38px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer">Lizenz erwerben →</button>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text3);text-align:center">
+        Bereits Lizenzinhaber? <span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="document.getElementById('trial-upgrade-overlay').remove();g('license-overlay').style.display='flex'">Lizenzschlüssel eingeben</span>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
 function startTrial(){
   const expiry = new Date();
   expiry.setDate(expiry.getDate()+30);
-  saveLicense({key:'TRIAL', type:'Testphase (30 Tage)', expiry:expiry.toISOString(), activated:new Date().toISOString()});
+  saveLicense({key:'TRIAL', type:'Testphase (30 Tage)', expiry:expiry.toISOString(), activated:new Date().toISOString(), projectsUsed:0});
   g('license-overlay').style.display='none';
   updateLicenseBadge();
+  showTrialWelcome();
+}
+
+function showTrialWelcome(){
+  setTimeout(()=>{
+    const banner=document.createElement('div');
+    banner.style.cssText='position:fixed;top:20px;right:20px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--r);padding:12px 16px;max-width:320px;z-index:8000;font-size:13px;color:var(--amber);line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,0.12)';
+    banner.innerHTML=`<strong>Testphase aktiv</strong><br>Sie können bis zu ${TRIAL_MAX_PROJECTS} Projekte speichern. <span style="text-decoration:underline;cursor:pointer" onclick="this.parentNode.remove()">OK</span>`;
+    document.body.appendChild(banner);
+    setTimeout(()=>banner.remove(), 5000);
+  }, 800);
 }
 
 function changeLicense(){
@@ -1341,6 +1549,13 @@ function updateLicenseBadge(){
   const exp=new Date(lic.expiry);
   const daysLeft=Math.ceil((exp-new Date())/(1000*60*60*24));
   if(daysLeft<=0){ badge.style.background='var(--red-bg)'; badge.style.color='var(--red)'; statusTxt.textContent='Lizenz abgelaufen'; return; }
+  if(lic.key==='TRIAL'){
+    const used=getTrialProjectCount();
+    const remaining=TRIAL_MAX_PROJECTS-used;
+    badge.style.background='var(--amber-bg)'; badge.style.color='var(--amber)';
+    statusTxt.textContent=`Trial · ${used}/${TRIAL_MAX_PROJECTS} Projekte · ${daysLeft} Tage`;
+    return;
+  }
   if(daysLeft<=14){ badge.style.background='var(--amber-bg)'; badge.style.color='var(--amber)'; statusTxt.textContent='Lizenz läuft ab ('+daysLeft+' Tage)'; return; }
   badge.style.background='var(--green-bg)'; badge.style.color='var(--green)';
   statusTxt.textContent=lic.type+' · '+daysLeft+' Tage';
@@ -1416,6 +1631,11 @@ function loadProjectData(proj){
 }
 
 function saveProject(){
+  // Trial-Einschränkung: max. 3 Projekte
+  if(isTrialLimited() && getTrialProjectCount() >= TRIAL_MAX_PROJECTS){
+    showTrialUpgradeOverlay();
+    return;
+  }
   const data=getProjectData();
   const name=prompt('Projektname:', data.name)||data.name;
   data.name=name;
@@ -2188,10 +2408,180 @@ function calc(){
   updateRechenweg();
 }
 
-// ── CHART.JS + APP START ──
+// ══════════════════════════════════════════
+// VARIANTENVERGLEICH
+// ══════════════════════════════════════════
+
+function vgl_getData(p){
+  const dach=+g('v'+p+'-dach').value||0, fass=+g('v'+p+'-fassade').value||0;
+  const fen=+g('v'+p+'-fenster').value||0, heiz=+g('v'+p+'-heizung').value||0;
+  const lueft=+g('v'+p+'-lueftung').value||0, pv=+g('v'+p+'-pv').value||0;
+  const kfw=+g('v'+p+'-kfw').value||0, bafa=+g('v'+p+'-bafa').value||0;
+  const vorher=+g('v'+p+'-vorher').value||180, nachher=+g('v'+p+'-nachher').value||55;
+  const name=g('v'+p+'-name').value||'Variante '+p;
+  const fl=+g('vgl-fl').value||800, ep=+g('vgl-ep').value||0.12;
+  const es=+g('vgl-es').value||3, miete=+g('vgl-miete').value||8.5;
+  const zins=+g('vgl-zins').value||3.5, ek=+g('vgl-ek').value||100000;
+  const tilg=+g('vgl-tilg').value||2, lz=+g('vgl-lz').value||20;
+  const nk=+g('vgl-nk').value||12, leer=+g('vgl-leer').value||3;
+
+  const basis=dach+fass+fen+heiz+lueft+pv;
+  const brutto=basis*(1+nk/100);
+  const foerd=basis*kfw/100+bafa;
+  const netto=Math.max(0,brutto-foerd);
+  const fk=Math.max(0,netto-ek);
+  const ann=fk*(zins+tilg)/100;
+
+  const einsparKwh=(vorher-nachher)*fl;
+  const einsparEur=einsparKwh*ep;
+  const co2=einsparKwh*0.201/1000;
+  const mietErh=Math.min(basis*0.08/12,fl*2.5)/fl;
+  const mietNeu=miete+mietErh;
+  const mieteJahr=fl*miete*12*(1-leer/100);
+  const mieteJahrNeu=fl*mietNeu*12*(1-leer/100);
+  const annSaving=einsparEur+(mieteJahrNeu-mieteJahr);
+
+  const amort=calcAmort(netto,annSaving,es);
+
+  const cfs=[];let es2=einsparEur,mE=mieteJahrNeu-mieteJahr;
+  for(let y=1;y<=lz;y++){cfs.push(es2+mE-ann);es2*=(1+es/100);mE*=(1+3/100);}
+  const npv=calcNPV(ek,cfs,5);
+  const irr=calcIRR(ek,cfs);
+
+  let kumE=0,kumM=0,es3=einsparEur,mE2=mieteJahrNeu-mieteJahr;
+  for(let y=1;y<=lz;y++){kumE+=es3;kumM+=mE2;es3*=(1+es/100);mE2*=(1+3/100);}
+  const roi=netto>0?((kumE+kumM-netto)/netto)*100:0;
+
+  const effVor=effKlasse(vorher),effNach=effKlasse(nachher);
+
+  return{name,brutto,foerd,netto,fk,ann,einsparEur,einsparKwh,co2,mietErh,amort,npv,irr,roi,effVor,effNach,vorher,nachher,annSaving,basis};
+}
+
+function effKlasse(kwh){
+  if(kwh<30)return{kl:'A+',col:'#0a6147'};
+  if(kwh<50)return{kl:'A',col:'#1D9E75'};
+  if(kwh<75)return{kl:'B',col:'#3B6D11'};
+  if(kwh<100)return{kl:'C',col:'#639922'};
+  if(kwh<130)return{kl:'D',col:'#BA7517'};
+  if(kwh<160)return{kl:'E',col:'#854F0B'};
+  if(kwh<200)return{kl:'F',col:'#D85A30'};
+  return{kl:'G/H',col:'#982020'};
+}
+
+function vgl_calc(){
+  const A=vgl_getData('A'), B=vgl_getData('B'), C=vgl_getData('C');
+  const variants=[A,B,C];
+  const colors=['var(--green)','var(--blue)','var(--amber)'];
+  const bgColors=['var(--green-bg)','var(--blue-bg)','var(--amber-bg)'];
+
+  // Update headers
+  ['A','B','C'].forEach((p,i)=>{
+    const th=g('vgl-th-'+p);
+    if(th) th.textContent=variants[i].name;
+  });
+
+  // Best performer per metric
+  const best=(arr,higher=true)=>{
+    const vals=arr.map(x=>typeof x==='number'?x:null);
+    const valid=vals.filter(x=>x!==null);
+    if(!valid.length)return-1;
+    const target=higher?Math.max(...valid):Math.min(...valid);
+    return vals.indexOf(target);
+  };
+
+  const rows=[
+    {label:'Bruttoinvestition',vals:variants.map(v=>eur(v.brutto)),nums:variants.map(v=>v.brutto),higher:false},
+    {label:'Förderungen',vals:variants.map(v=>eur(v.foerd)),nums:variants.map(v=>v.foerd),higher:true},
+    {label:'Nettoinvestition',vals:variants.map(v=>eur(v.netto)),nums:variants.map(v=>v.netto),higher:false},
+    {label:'Annuität p.a.',vals:variants.map(v=>eur(v.ann)),nums:variants.map(v=>v.ann),higher:false},
+    {label:'Energieeinsparung p.a.',vals:variants.map(v=>eur(v.einsparEur)),nums:variants.map(v=>v.einsparEur),higher:true},
+    {label:'CO₂-Reduktion p.a.',vals:variants.map(v=>fmt(v.co2,1)+' t'),nums:variants.map(v=>v.co2),higher:true},
+    {label:'Mieterhöhung §559',vals:variants.map(v=>fmt(v.mietErh,2).replace('.',',')+'  €/m²'),nums:variants.map(v=>v.mietErh),higher:true},
+    {label:'Amortisation',vals:variants.map(v=>typeof v.amort==='number'?v.amort+' J.':v.amort),nums:variants.map(v=>typeof v.amort==='number'?v.amort:999),higher:false},
+    {label:'ROI',vals:variants.map(v=>fmt(v.roi,1).replace('.',',')+' %'),nums:variants.map(v=>v.roi),higher:true},
+    {label:'Kapitalwert (NPV)',vals:variants.map(v=>eur(v.npv)),nums:variants.map(v=>v.npv),higher:true},
+    {label:'IRR',vals:variants.map(v=>fmt(v.irr,1).replace('.',',')+' %'),nums:variants.map(v=>v.irr),higher:true},
+    {label:'Effizienzklasse vorher',vals:variants.map(v=>`<span style="font-weight:600;color:${v.effVor.col}">${v.effVor.kl}</span> (${v.vorher} kWh)`),nums:null},
+    {label:'Effizienzklasse nachher',vals:variants.map(v=>`<span style="font-weight:600;color:${v.effNach.col}">${v.effNach.kl}</span> (${v.nachher} kWh)`),nums:null},
+  ];
+
+  const tbody=g('vgl-tbody');
+  tbody.innerHTML=rows.map(r=>{
+    const bestIdx=r.nums?best(r.nums,r.higher):-1;
+    const cells=r.vals.map((val,i)=>{
+      const isBest=bestIdx===i;
+      return`<td style="text-align:right;${isBest?'font-weight:600;color:'+colors[i].replace('var(','').replace(')','').replace('--',''):''}">
+        ${isBest?`<span style="background:${bgColors[i]};padding:2px 6px;border-radius:4px;color:${colors[i]}">${val}</span>`:val}
+      </td>`;
+    }).join('');
+    return`<tr><td style="font-weight:500;font-size:13px">${r.label}</td>${cells}</tr>`;
+  }).join('');
+
+  // Winner badge
+  const roiBest=['A','B','C'][best(variants.map(v=>v.roi),true)];
+  const amortBest=['A','B','C'][best(variants.map(v=>typeof v.amort==='number'?v.amort:999),false)];
+  const badge=g('vgl-winner-badge');
+  if(badge) badge.textContent=`Bester ROI: Variante ${roiBest} · Schnellste Amortisation: Variante ${amortBest}`;
+
+  // Visual bars
+  const bars=g('vgl-bars');
+  const barMetrics=[
+    {label:'ROI (%)',vals:variants.map(v=>v.roi),unit:'%',higher:true},
+    {label:'Energieeinsparung (€/a)',vals:variants.map(v=>v.einsparEur),unit:'€',higher:true},
+    {label:'Nettoinvestition (€)',vals:variants.map(v=>v.netto),unit:'€',higher:false},
+    {label:'CO₂-Reduktion (t/a)',vals:variants.map(v=>v.co2),unit:'t',higher:true},
+  ];
+  const barCols=['#0a6147','#1458a0','#854F0B'];
+  bars.innerHTML=barMetrics.map(m=>{
+    const maxVal=Math.max(...m.vals.filter(x=>x>0),1);
+    return`<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px">${m.label}</div>
+      ${variants.map((v,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div style="width:80px;font-size:12px;color:var(--text2)">${v.name}</div>
+          <div style="flex:1;height:20px;background:var(--surface2);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(m.vals[i]/maxVal*100)}%;background:${barCols[i]};border-radius:4px;transition:width .4s ease;opacity:0.85"></div>
+          </div>
+          <div style="width:80px;font-size:12px;font-weight:500;text-align:right">${m.unit==='%'?fmt(m.vals[i],1).replace('.',',')+' %':m.unit==='t'?fmt(m.vals[i],1)+' t':eur(m.vals[i])}</div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function vgl_importCurrent(){
+  // Übernimmt die aktuellen Haupteingaben als Variante A
+  const fields=['dach','fassade','fenster','heizung','lueftung','pv'];
+  fields.forEach(f=>{const el=g(f);if(el&&g('vA-'+f))g('vA-'+f).value=el.value;});
+  if(g('vorher')&&g('vA-vorher'))g('vA-vorher').value=g('vorher').value;
+  if(g('nachher')&&g('vA-nachher'))g('vA-nachher').value=g('nachher').value;
+  if(g('kfw')&&g('vA-kfw'))g('vA-kfw').value=g('kfw').value;
+  if(g('bafa')&&g('vA-bafa'))g('vA-bafa').value=g('bafa').value;
+  if(g('flaeche')&&g('vgl-fl'))g('vgl-fl').value=g('flaeche').value;
+  if(g('epreis')&&g('vgl-ep'))g('vgl-ep').value=g('epreis').value;
+  if(g('miete')&&g('vgl-miete'))g('vgl-miete').value=g('miete').value;
+  if(g('zins')&&g('vgl-zins'))g('vgl-zins').value=g('zins').value;
+  if(g('ek')&&g('vgl-ek'))g('vgl-ek').value=g('ek').value;
+  if(g('tilgung')&&g('vgl-tilg'))g('vgl-tilg').value=g('tilgung').value;
+  if(g('laufzeit')&&g('vgl-lz'))g('vgl-lz').value=g('laufzeit').value;
+  vgl_calc();
+  alert('Aktuelle Eingaben als Variante A übernommen.');
+}
+
+function vgl_reset(){
+  ['A','B','C'].forEach(p=>{
+    ['dach','fassade','fenster','heizung','lueftung','pv'].forEach(f=>{const el=g('v'+p+'-'+f);if(el)el.value=0;});
+  });
+  vgl_calc();
+}
 const script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-script.onload=()=>{ calc(); appInit(); };
+script.onload=()=>{
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const et=g('tab-eingabe');if(et)et.classList.add('active');
+  const nb=document.querySelector('.nav-btn');if(nb)nb.classList.add('active');
+  calc(); vgl_calc(); appInit();
+};
 document.head.appendChild(script);
 </script>
 </body>
