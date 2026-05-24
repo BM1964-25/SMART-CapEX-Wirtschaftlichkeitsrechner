@@ -375,7 +375,17 @@ canvas{max-width:100%;display:block}
           <div class="field"><label>Verbrauch vorher <span class="unit">kWh/m²a</span></label><input type="number" id="vorher" value="180" onchange="calc()"></div>
           <div class="field"><label>Verbrauch nachher <span class="unit">kWh/m²a</span></label><input type="number" id="nachher" value="55" onchange="calc()"></div>
           <div class="field"><label>Energiepreis <span class="unit">€/kWh</span></label><input type="number" id="epreis" value="0,12" step="0.01" onchange="calc()"></div>
-          <div class="field"><label>Energiepreissteigerung <span class="unit">%/a</span></label><input type="number" id="estieg" value="3" onchange="calc()"></div>
+          <div class="field"><label>Preissteigerung <span class="unit">%/a</span></label><input type="number" id="estieg" value="3" onchange="calc()"></div>
+          <div class="field"><label>Energieträger</label>
+            <select id="energietraeger" onchange="calc()">
+              <option value="strom">Strom (0,380 kg/kWh)</option>
+              <option value="gas">Erdgas (0,202 kg/kWh)</option>
+              <option value="oel">Heizöl (0,266 kg/kWh)</option>
+              <option value="fernwaerme">Fernwärme (0,175 kg/kWh)</option>
+              <option value="waermepumpe">Wärmepumpe (0,114 kg/kWh)</option>
+            </select>
+          </div>
+          <div class="field"><label>CO₂-Preis Prognose 2030 <span class="unit">€/t</span></label><input type="number" id="co2_proj_preis" value="200" onchange="calc()" title="Szenariowert — variierbar (EU-ETS Zielkorridor: 150–250 €/t)"></div>
         </div>
       </div>
     </div>
@@ -1061,8 +1071,8 @@ canvas{max-width:100%;display:block}
     <div class="panel-head">CO₂-Bepreisung & Kostenentwicklung</div>
     <div class="panel-body">
       <div class="grid3">
-        <div class="metric warn"><div class="metric-label">CO₂-Kosten heute p.a.</div><div class="metric-value" id="geg-co2-heute">--</div><div class="metric-sub">bei 45 €/t</div></div>
-        <div class="metric bad"><div class="metric-label">CO₂-Kosten 2030 p.a.</div><div class="metric-value" id="geg-co2-2030">--</div><div class="metric-sub">bei 200 €/t (Ziel)</div></div>
+        <div class="metric warn"><div class="metric-label">CO₂-Kosten heute p.a.</div><div class="metric-value" id="geg-co2-heute">--</div><div class="metric-sub">bei 45 €/t (aktuell)</div></div>
+        <div class="metric bad"><div class="metric-label">CO₂-Kosten 2030 p.a.</div><div class="metric-value" id="geg-co2-2030">--</div><div class="metric-sub">Prognosewert variierbar</div></div>
         <div class="metric good"><div class="metric-label">Einsparung durch Mod.</div><div class="metric-value" id="geg-co2-erspar">--</div><div class="metric-sub">CO₂-Kosten 2030</div></div>
       </div>
     </div>
@@ -1143,48 +1153,93 @@ function calc(){
   const dach=v('dach'),fass=v('fassade'),fen=v('fenster'),heiz=v('heizung'),lueft=v('lueftung'),pv=v('pv'),sonst=v('sonstige');
   const basis=dach+fass+fen+heiz+lueft+pv+sonst;
   const brutto=basis*(1+nkP/100);
+
+  // Förderung: KfW und BAFA sind von der umlagefähigen Basis abzuziehen (§559 BGB)
   const kfwB=basis*v('kfw')/100,tilgzB=basis*v('tilgz')/100,foerd=kfwB+v('bafa')+tilgzB;
   const netto=brutto-foerd;
   const ek=v('ek'),fk=Math.max(0,netto-ek);
-  const zins=v('zins')-v('zinsv'),tilg=v('tilgung'),ann=fk*(zins+tilg)/100,lz=v('laufzeit');
+
+  // ── ANNUITÄT: echte Annuitätenformel ──
+  // A = K × i(1+i)^n / ((1+i)^n - 1)
+  const zinsBrut=Math.max(0.001, v('zins')-v('zinsv'));
+  const i=zinsBrut/100;  // Zinssatz als Dezimalzahl
+  const n=Math.max(1,v('laufzeit'));
+  const tilg=v('tilgung');
+  let ann;
+  if(i>0 && fk>0){
+    // Echte Annuität nach Annuitätenmethode
+    ann = fk * (i * Math.pow(1+i,n)) / (Math.pow(1+i,n) - 1);
+  } else {
+    ann = fk * tilg/100; // Fallback: nur Tilgung
+  }
+  const zins=zinsBrut; // für S-State
+  const lz=n;
+
+  // ── ENERGIE: energieträgerspezifischer CO₂-Faktor ──
   const vor=v('vorher'),nach=v('nachher'),ep=v('epreis'),es=v('estieg');
-  const einsparKwh=(vor-nach)*fl,einsparEur=einsparKwh*ep,co2=einsparKwh*0.201/1000;
+  const einsparKwh=(vor-nach)*fl;
+  const einsparEur=einsparKwh*ep;
+  // CO₂-Faktoren nach Energieträger (kg CO₂/kWh, Primärenergie DE 2024)
+  const energietraeger=g('energietraeger')?.value||'strom';
+  const co2Faktoren={
+    strom:0.380,    // Strommix DE 2024 (UBA)
+    gas:0.202,      // Erdgas
+    oel:0.266,      // Heizöl
+    fernwaerme:0.175, // Fernwärme DE-Ø
+    waermepumpe:0.114 // WP mit Strommix 2024
+  };
+  const co2Faktor=co2Faktoren[energietraeger]||0.380;
+  const co2=einsparKwh*co2Faktor/1000; // Tonnen CO₂/a
+
   const miete=v('miete'),ms=v('mstieg'),leer=v('leer');
-  // §559 BGB Mieterhöhung — korrekt mit §559a Kappungsgrenze
-  // Max. 8% der Modernisierungskosten p.a. → pro m² pro Monat
-  // §559a: max. 3 €/m² in 6 Jahren = 0,50 €/m²/Monat Kappungsgrenze
-  const mietErh559Annual = basis * 0.08;          // €/Jahr gesamt
-  const mietErh559Monthly_m2 = mietErh559Annual / 12 / fl; // €/m²/Monat unkappiert
-  const mietErh559Cap = 0.50;                      // §559a Kappung: 0,50 €/m²/Monat
-  const mietErh = Math.min(mietErh559Monthly_m2, mietErh559Cap); // €/m²/Monat
+
+  // ── §559 BGB MIETERHÖHUNG — fachlich korrekt ──
+  // Umlagefähige Kosten = Modernisierungskosten - Instandhaltung - Förderung
+  // Näherung: Förderung wird abgezogen (§559 Abs.2)
+  const umlagefaehig = Math.max(0, basis - foerd);
+  const mietErh559Annual = umlagefaehig * 0.08; // 8% p.a. der umlagefähigen Kosten
+  const mietErh559_m2_mo = mietErh559Annual / 12 / fl; // €/m²/Monat unkappiert
+
+  // §559a Kappungsgrenze: 3 €/m² in 6 Jahren = 0,50 €/m²/Monat (Regelfall)
+  // Bei Ausgangsmiete < 7 €/m²: 2 €/m² in 6 Jahren = 0,333 €/m²/Monat
+  const kappungRegelfall = 3.0 / 6 / 1;   // = 0,50 €/m²/Monat
+  const kappungNiedrigmiete = 2.0 / 6 / 1; // = 0,333 €/m²/Monat
+  const kappung = miete < 7.0 ? kappungNiedrigmiete : kappungRegelfall;
+  const mietErh = Math.min(mietErh559_m2_mo, kappung);
   const mietNeu = miete + mietErh;
-  const mieteJahr = fl * miete * 12 * (1-leer/100);
+  const mieteJahr    = fl * miete * 12 * (1-leer/100);
   const mieteJahrNeu = fl * mietNeu * 12 * (1-leer/100);
-  const diskont = v('diskont');
+  const diskont=v('diskont');
 
-  // Mietrendite korrekt: Bezug auf Verkehrswert (Bestandsrendite)
-  // rendVor = Jahreskaltmiete / Verkehrswert (vor Invest)
-  // rendNach = Jahreskaltmiete-Neu / (Verkehrswert + Bruttoinvestition)
-  const vkwVal = v('vkw') || brutto * 3; // Fallback wenn VKW nicht eingegeben
-  const rendVor  = vkwVal > 0 ? (mieteJahr    / vkwVal) * 100 : 0;
-  const rendNach = (vkwVal + brutto) > 0 ? (mieteJahrNeu / (vkwVal + brutto)) * 100 : 0;
+  // ── MIETRENDITEN ──
+  const vkwVal=v('vkw')||brutto*3;
+  const rendVor  = vkwVal>0 ? (mieteJahr    / vkwVal)*100 : 0;
+  const rendNach = (vkwVal+brutto)>0 ? (mieteJahrNeu / (vkwVal+brutto))*100 : 0;
 
-  // Nettomietrendite: auf Gesamtinvestition (VKW + Brutto) bezogen
-  const bewirtsch = mieteJahrNeu * 0.22; // 22% Bewirtschaftungskosten (Branche: 18-25%)
-  const nrr = (vkwVal + brutto) > 0 ? ((mieteJahrNeu - bewirtsch - ann) / (vkwVal + brutto)) * 100 : 0;
+  // ── NRR — Einheitenkonsistenz sichergestellt ──
+  // Alle Werte in €/Jahr: mieteJahrNeu, bewirtsch, ann
+  const bewirtsch = mieteJahrNeu * 0.22; // 22% der Jahreskaltmiete
+  const nrr = (vkwVal+brutto)>0
+    ? ((mieteJahrNeu - bewirtsch - ann) / (vkwVal+brutto))*100
+    : 0;
 
+  // ── AMORTISATION & CASHFLOWS ──
   const amort=calcAmort(netto,einsparEur+(mieteJahrNeu-mieteJahr),es);
   const cfs=[];let es2=einsparEur,mE=mieteJahrNeu-mieteJahr;
   for(let y=1;y<=lz;y++){cfs.push(es2+mE-ann);es2*=(1+es/100);mE*=(1+ms/100);}
   const npv=calcNPV(ek,cfs,diskont),irr=calcIRR(ek,cfs);
 
-  // ROI: (Gesamtnutzen - Nettoinvestition) / Nettoinvestition × 100
-  // Gesamtnutzen = kumulierte Energieeinsparung + kumulierte Mietmehreinnahmen + Wertsteigerung (Vergleichswert)
-  const vglNachRoi=(v('vgl-nach')||0)*fl, vglVorRoi=(v('vgl-vor')||0)*fl;
+  // ── ROI ──
+  const vglNachRoi=(v('vgl-nach')||0)*fl,vglVorRoi=(v('vgl-vor')||0)*fl;
   const wertsteigerung=vglNachRoi>0?(vglNachRoi-vglVorRoi):0;
   let kumEinspar=0,kumMiet=0,es3=einsparEur,mE2=mieteJahrNeu-mieteJahr;
   for(let y=1;y<=lz;y++){kumEinspar+=es3;kumMiet+=mE2;es3*=(1+es/100);mE2*=(1+ms/100);}
   const gesamtnutzen=kumEinspar+kumMiet+wertsteigerung;
+  const roi=netto>0?((gesamtnutzen-netto)/netto)*100:0;
+
+  // CO₂-Kosten: als Szenariowerte (nicht als absolute Wahrheit)
+  S.co2Faktor=co2Faktor;
+  S.co2ProjPreis=v('co2_proj_preis')||200; // variabler Prognosewert
   const roi=netto>0?((gesamtnutzen-netto)/netto)*100:0;
   const roiCard=g('m-roi-card');
   g('m-roi').textContent=pct(roi,0);
@@ -1194,17 +1249,38 @@ function calc(){
   roiCard.querySelectorAll('div').forEach(d=>{if(d.style.color!==undefined)d.style.color=roi>=0?'var(--green)':'var(--red)';});
   g('m-roi').style.color=roi>=0?'var(--green)':'var(--red)';
 
-  S={brutto,netto,fk,ann,ek,zins,lz,fl,einsparEur,einsparKwh,mieteJahrNeu,mieteJahr,basisKosten:basis,foerd,co2,vor,nach,mietErh,miete,mietNeu,leer,ms};
+  S={brutto,netto,fk,ann,ek,zins,lz,fl,einsparEur,einsparKwh,mieteJahrNeu,mieteJahr,
+     basisKosten:basis,foerd,co2,vor,nach,mietErh,miete,mietNeu,leer,ms,
+     co2Faktor,vkwVal,umlagefaehig};
 
-  g('m-brutto').textContent=eur(brutto);g('m-foerd').textContent=eur(foerd);g('m-netto').textContent=eur(netto);
-  g('m-fk').textContent=eur(fk);g('m-ann').textContent=eur(ann);g('m-qm').textContent=Math.round(brutto/fl)+' €';
-  g('m-einspar').textContent=eur(einsparEur);g('m-einspar-kwh').textContent=fmt(einsparKwh,0)+' kWh/a';
-  g('m-co2').textContent=fmt(co2,1)+' t';g('m-miete559').textContent=fmt(mietErh,2).replace('.',',')+' €/m²/Mo.';
+  g('m-brutto').textContent=eur(brutto);
+  g('m-foerd').textContent=eur(foerd);
+  g('m-netto').textContent=eur(netto);
+  g('m-fk').textContent=eur(fk);
+  g('m-ann').textContent=eur(ann);
+  g('m-qm').textContent=fl>0?Math.round(brutto/fl)+' €':'–';
+  g('m-einspar').textContent=eur(einsparEur);
+  g('m-einspar-kwh').textContent=fmt(einsparKwh,0)+' kWh/a';
+  // CO₂ mit Hinweis auf verwendeten Faktor
+  const traegerLabel={'strom':'Strom','gas':'Gas','oel':'Öl','fernwaerme':'Fernwärme','waermepumpe':'Wärmepumpe'};
+  g('m-co2').textContent=fmt(co2,1)+' t';
+  const co2Sub=g('m-co2')?.nextElementSibling;
+  if(co2Sub) co2Sub.textContent=`${co2Faktor*1000}g CO₂/kWh (${traegerLabel[energietraeger]||'Strom'})`;
+
+  // §559: Anzeige mit Hinweis ob Kappung gegriffen hat
+  const gekapppt=mietErh559_m2_mo>kappung;
+  g('m-miete559').textContent=fmt(mietErh,2).replace('.',',')+' €/m²/Mo.';
+  const m559sub=document.querySelector('#m-miete559')?.closest('.metric')?.querySelector('.metric-sub');
+  if(m559sub) m559sub.textContent=gekapppt?`Kappung §559a (${(kappung).toFixed(2)} €/m²/Mo.)`:'8% Umlage (§559 BGB)';
+
   g('m-amort').textContent=(typeof amort==='number'?amort+' J.':amort);
-  g('m-npv').textContent=eur(npv);g('m-npv-sub').textContent=lz+'-Jahres-Betrachtung';
-  g('m-irr').textContent=pct(irr);g('m-rend-vor').textContent=pct(rendVor);
-  g('m-rend-nach').textContent=pct(rendNach);g('m-nrr').textContent=pct(nrr);
-  g('einspar-pct').textContent=Math.round((1-nach/vor)*100)+' %';
+  g('m-npv').textContent=eur(npv);
+  g('m-npv-sub').textContent=lz+'-Jahres-Betrachtung';
+  g('m-irr').textContent=pct(irr);
+  g('m-rend-vor').textContent=pct(rendVor);
+  g('m-rend-nach').textContent=pct(rendNach);
+  g('m-nrr').textContent=pct(nrr);
+  g('einspar-pct').textContent=vor>0?Math.round((1-nach/vor)*100)+' %':'–';
 
   g('m-amort-card').className='metric '+(typeof amort==='number'&&amort<=15?'good':typeof amort==='number'&&amort<=25?'warn':'bad');
   g('m-npv-card').className='metric '+(npv>0?'good':'bad');
@@ -1239,13 +1315,12 @@ function calc(){
 let chartTilg=null;
 function calcFinanzplan(){
   const fk=S.fk;
-  // Zins direkt aus Feld lesen (nicht aus S, um alte Cache-Werte zu vermeiden)
-  const zins=Math.max(0.01, v('zins')-v('zinsv'));
-  const tilg=v('tilgung');
-  const lz=v('laufzeit');
+  const zins=Math.max(0.001, v('zins')-v('zinsv'));
+  const i=zins/100;
+  const n=Math.max(1,v('laufzeit'));
   if(fk<=0){g('fp-darlehen').textContent='0 €';return;}
-  const annRate=(zins+tilg)/100;
-  const ann=fk*annRate;
+  // Echte Annuitätenformel: A = K × i(1+i)^n / ((1+i)^n - 1)
+  const ann = i>0 ? fk*(i*Math.pow(1+i,n))/(Math.pow(1+i,n)-1) : fk/n;
   let schuld=fk,gZins=0;
   const rows=[];let vollTilg=lz;
   for(let y=1;y<=50;y++){
@@ -1347,12 +1422,19 @@ function calcGEG(){
   const fl=S.fl||v('flaeche')||0;
   if(!vor||!nach||!fl) return;
   const bj=v('baujahr');
-  const co2Vor=vor*fl*0.201/1000;
-  const co2Nach=nach*fl*0.201/1000;
+  const co2Vor=vor*fl*(S.co2Faktor||0.380)/1000;
+  const co2Nach=nach*fl*(S.co2Faktor||0.380)/1000;
+  const co2ProjPreis=v('co2_proj_preis')||200;
 
   g('geg-co2-heute').textContent=eur(co2Vor*45);
-  g('geg-co2-2030').textContent=eur(co2Vor*200);
-  g('geg-co2-erspar').textContent=eur((co2Vor-co2Nach)*200);
+  g('geg-co2-2030').textContent=eur(co2Vor*co2ProjPreis);
+  g('geg-co2-erspar').textContent=eur((co2Vor-co2Nach)*co2ProjPreis);
+
+  // Labels dynamisch aktualisieren
+  const sub2030=document.querySelector('#geg-co2-2030')?.closest('.metric')?.querySelector('.metric-sub');
+  if(sub2030) sub2030.textContent=`bei ${co2ProjPreis} €/t (Prognose)`;
+  const subErspar=document.querySelector('#geg-co2-erspar')?.closest('.metric')?.querySelector('.metric-sub');
+  if(subErspar) subErspar.textContent=`CO₂-Kosten 2030 (${co2ProjPreis} €/t)`;
 
   const checks=[
     {label:'Mindestanforderung Wärmedurchgangskoeff. Dach (U ≤ 0,24 W/m²K)',ok:nach<130},
