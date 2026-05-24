@@ -48,8 +48,33 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;font-size:15px;
 .field.full{grid-column:1/-1}
 label{font-size:12px;color:var(--text2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .unit{font-size:11px;color:var(--text3);margin-left:2px;font-weight:400}
-input[type=number],select{height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none;min-width:0}
-input[type=number]:focus,select:focus{border-color:var(--green)}
+/* INPUT WITH SUFFIX (€, %, m²) */
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-wrap input{padding-right:28px!important}
+.input-suffix{position:absolute;right:8px;font-size:12px;color:var(--text3);font-weight:500;pointer-events:none;user-select:none}
+/* Pfeile/Spinner bei Zahlenfeldern komplett entfernen */
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;display:none}
+.input-wrap input[type=number]{-moz-appearance:textfield}
+.input-wrap input[type=number]::-webkit-outer-spin-button,
+.input-wrap input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;display:none}
+
+/* Einheitliche Felddarstellung */
+input[type=number],input[type=text],select,textarea{
+  height:36px;padding:0 10px;font-size:13px;
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  background:var(--surface);
+  color:var(--text);
+  width:100%;outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+input[type=number]:focus,input[type=text]:focus,select:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(10,97,71,0.08);
+}
+textarea{height:auto;padding:8px 10px}
 .section-label{font-size:12px;font-weight:600;color:var(--text2);margin:12px 0 8px;padding-bottom:5px;border-bottom:0.5px solid var(--border);letter-spacing:.04em;text-transform:uppercase}
 
 /* 4-col field grids → 2-col on small screens */
@@ -57,11 +82,17 @@ input[type=number]:focus,select:focus{border-color:var(--green)}
 .fields-4-to-2{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
 @media(max-width:700px){.fields-4,.fields-4-to-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* METRICS */
-.metric{background:var(--surface2);border-radius:var(--r);padding:12px 13px}
-.metric-label{font-size:12px;color:var(--text2);margin-bottom:4px}
-.metric-value{font-size:22px;font-weight:500;line-height:1.1;color:var(--text)}
-.metric-sub{font-size:12px;color:var(--text3);margin-top:3px}
+/* METRICS — zentriert in allen Tabs */
+.metric{background:var(--surface2);border-radius:var(--r);padding:12px 13px;text-align:center}
+.metric-label{font-size:12px;color:var(--text2);margin-bottom:4px;text-align:center}
+.metric-value{font-size:22px;font-weight:500;line-height:1.1;color:var(--text);text-align:center}
+.metric-sub{font-size:12px;color:var(--text3);margin-top:3px;text-align:center}
+/* Sicherstellen dass alle Kinder im metric zentriert sind */
+.metric>*{text-align:center}
+.metric .tooltip-wrap{justify-content:center}
+.wert-box{background:var(--surface2);border-radius:var(--r);padding:12px 14px;text-align:center}
+.wert-box .label{font-size:12px;color:var(--text2);margin-bottom:4px;text-align:center}
+.wert-box .val{font-size:22px;font-weight:500;text-align:center}
 .metric.good .metric-value{color:var(--green)}
 .metric.warn .metric-value{color:var(--amber)}
 .metric.info .metric-value{color:var(--blue)}
@@ -145,16 +176,38 @@ canvas{max-width:100%;display:block}
 .val-msg.ok{display:block;color:var(--green);background:var(--green-bg)}
 #validation-banner{display:none;padding:10px 14px;background:var(--red-bg);border:1px solid var(--red);border-radius:var(--r);font-size:13px;color:var(--red);margin-bottom:10px;line-height:1.6}
 /* RECHENWEG */
-.acc-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 0;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:500;margin-top:4px}
+.acc-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:4px 0;font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:500;margin-top:4px;width:100%}
 .acc-btn:hover{color:var(--green)}
 .acc-content{display:none;background:var(--surface2);border-radius:var(--r);padding:10px 12px;font-size:12px;margin-top:4px;line-height:1.7;border-left:3px solid var(--blue)}
 .acc-content.open{display:block}
 .acc-content code{font-family:monospace;font-size:13px;color:var(--blue);font-weight:600}
 .acc-content .calc-step{padding:3px 0;border-bottom:0.5px solid var(--border)}
 .acc-content .calc-step:last-child{border:none;font-weight:600;color:var(--green)}
+
+/* HILFE TAB */
+.hilfe-kz{border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:6px;cursor:pointer}
+.hilfe-kz-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface2);font-size:13px;color:var(--text);user-select:none}
+.hilfe-kz-head:hover{background:var(--surface3,#e8e7e0)}
+.hilfe-kz-body{display:none;padding:10px 14px;font-size:12px;color:var(--text2);line-height:1.7;border-top:0.5px solid var(--border)}
+.hilfe-kz-body.open{display:block}
+/* AMPEL */
+.ampel-green{background:var(--green-bg)!important;border:1px solid var(--green)!important}
+.ampel-amber{background:var(--amber-bg)!important;border:1px solid var(--amber)!important}
+.ampel-red{background:var(--red-bg)!important;border:1px solid var(--red)!important}
+/* AUTOSAVE */
+#autosave-indicator{position:fixed;bottom:16px;right:16px;padding:6px 12px;background:var(--green-bg);border:0.5px solid var(--green);border-radius:var(--r);font-size:11px;color:var(--green);font-weight:500;opacity:0;transition:opacity .5s;pointer-events:none;z-index:1000}
+#autosave-indicator.show{opacity:1}
+/* PRINT */
+@media print{
+  .nav,.btn-pdf,.btn-outline,.btn-primary,#settings-nav-btn,#autosave-indicator{display:none!important}
+  .tab-page{display:block!important}
+  .panel{break-inside:avoid}
+  body{padding:0}
+}
 </style>
 </head>
 <body>
+<div id="autosave-indicator">✓ Automatisch gespeichert</div>
 
 <!-- ═══ LIZENZ-OVERLAY (beim Start) ═══ -->
 <div id="license-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,15,20,0.85);z-index:9999;align-items:center;justify-content:center">
@@ -185,14 +238,19 @@ canvas{max-width:100%;display:block}
     </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-    <button class="btn-outline" onclick="saveProject()" style="font-size:12px;padding:5px 10px">💾</button>
-    <button class="btn-outline" onclick="document.getElementById('proj-import-file').click()" style="font-size:12px;padding:5px 10px">📂</button>
-    <button class="btn-outline" onclick="newProject()" style="font-size:12px;padding:5px 10px">＋ Neu</button>
+    <button class="btn-outline" onclick="saveProject()" style="font-size:12px;padding:5px 10px" title="Projekt speichern">💾</button>
+    <button class="btn-outline" onclick="document.getElementById('proj-import-file').click()" style="font-size:12px;padding:5px 10px" title="Projekt laden">📂</button>
+    <button class="btn-outline" onclick="resetProject()" style="font-size:12px;padding:5px 10px" title="Felder zurücksetzen">↺ Reset</button>
     <input type="file" id="proj-import-file" accept=".json" style="display:none" onchange="importProject(event)">
     <button class="btn-pdf" onclick="exportPDF()" style="padding:5px 12px;font-size:12px">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       PDF
     </button>
+    <button class="btn-pdf" onclick="exportSummarySheet()" style="padding:5px 12px;font-size:12px;background:var(--blue-bg);color:var(--blue);border-color:var(--blue)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      1-Seiter
+    </button>
+    <button onclick="showTab('hilfe',this)" class="nav-btn" style="padding:5px 12px;font-size:12px">? Hilfe</button>
     <button onclick="showTab('einstellungen',this)" id="settings-nav-btn" class="nav-btn" style="padding:5px 12px;font-size:12px">⚙ Einstellungen</button>
   </div>
 </div>
@@ -207,12 +265,73 @@ canvas{max-width:100%;display:block}
   <button class="nav-btn" id="ki-tab-btn" onclick="showTab('ki',this)" style="background:linear-gradient(135deg,#0a6147,#1458a0);color:#fff;border-color:transparent">✦ KI-Analyse</button>
 </div>
 
+<!-- KENNZAHLEN-AMPEL -->
+<div id="ampel-banner" style="display:none;padding:10px 16px;border-radius:var(--r);margin-bottom:12px;flex-wrap:wrap;gap:10px;align-items:center">
+  <div style="font-size:22px" id="ampel-icon">🟡</div>
+  <div style="flex:1;min-width:180px">
+    <div style="font-size:13px;font-weight:600" id="ampel-title">–</div>
+    <div style="font-size:11px;margin-top:1px;opacity:.8" id="ampel-desc">–</div>
+  </div>
+</div>
+
 <!-- ═══════════════════ TAB 1: EINGABE ═══════════════════ -->
 <div id="tab-eingabe" class="tab-page active">
 <div id="validation-banner"></div>
 <div class="grid2">
 
   <div>
+    <div class="panel">
+      <div class="panel-head">Projektangaben</div>
+      <div class="panel-body">
+        <div class="fields-4">
+          <div class="field" style="grid-column:1/-1">
+            <label>Projektbezeichnung</label>
+            <input type="text" id="proj-bezeichnung" placeholder="z.B. MFH Musterstraße 12, München" oninput="updateTopbarName()" style="height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Auftraggeber / Eigentümer</label>
+            <input type="text" id="proj-auftraggeber" placeholder="z.B. Max Mustermann GmbH" style="height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none">
+          </div>
+          <div class="field">
+            <label>Bearbeiter</label>
+            <input type="text" id="proj-bearbeiter" placeholder="Name" style="height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none">
+          </div>
+          <div class="field">
+            <label>Datum</label>
+            <input type="date" id="proj-datum" style="height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none">
+          </div>
+          <div class="field">
+            <label>Leistungsphase</label>
+            <select id="proj-lph" style="height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none">
+              <option>Machbarkeitsstudie</option>
+              <option>Vorplanung</option>
+              <option>Entwurfsplanung</option>
+              <option>Ausführungsplanung</option>
+              <option>Vergabe</option>
+              <option>Realisierung</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="proj-status" style="height:34px;padding:0 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none">
+              <option>In Bearbeitung</option>
+              <option>Zur Prüfung</option>
+              <option>Freigegeben</option>
+              <option>Abgeschlossen</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Projektbeschreibung</label>
+            <textarea id="proj-beschreibung" placeholder="Kurze Beschreibung des Projekts, Besonderheiten, Ziele der Modernisierung..." style="padding:8px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none;resize:vertical;font-family:inherit;min-height:80px;max-height:300px;line-height:1.6"></textarea>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Notizen / Bemerkungen</label>
+            <textarea id="proj-notizen" placeholder="Projektbezogene Hinweise..." rows="2" style="padding:6px 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);width:100%;outline:none;resize:vertical;font-family:inherit"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-head">Objektdaten</div>
       <div class="panel-body">
@@ -232,7 +351,7 @@ canvas{max-width:100%;display:block}
               <option value="1.6">Top-7-Stadt</option><option value="0.7">Ländlich</option>
             </select>
           </div>
-          <div class="field" style="grid-column:span 4"><label>Verkehrswert aktuell <span class="unit">€</span></label><input type="number" id="vkw" value="1200000" onchange="calc()" step="1000" style="max-width:200px"></div>
+          <div class="field" style="grid-column:span 4"><label>Verkehrswert aktuell</label><div class="input-wrap"><input type="number" id="vkw" value="1200000" onchange="calc()" step="1000" style="max-width:200px"><span class="input-suffix">€</span></div></div>
         </div>
       </div>
     </div>
@@ -242,20 +361,20 @@ canvas{max-width:100%;display:block}
       <div class="panel-body">
         <div class="section-label">Investitionskosten</div>
         <div class="fields-4">
-          <div class="field"><label>Dämmung Dach <span class="unit">€</span></label><input type="number" id="dach" value="45000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Dämmung Fassade <span class="unit">€</span></label><input type="number" id="fassade" value="80000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Fenster / Türen <span class="unit">€</span></label><input type="number" id="fenster" value="60000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Heizungsanlage <span class="unit">€</span></label><input type="number" id="heizung" value="55000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Lüftung / WRG <span class="unit">€</span></label><input type="number" id="lueftung" value="20000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>PV-Anlage <span class="unit">€</span></label><input type="number" id="pv" value="30000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Sonstige <span class="unit">€</span></label><input type="number" id="sonstige" value="10000" onchange="calc()" step="1000"></div>
+          <div class="field"><label>Dämmung Dach</label><div class="input-wrap"><input type="number" id="dach" value="45000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Dämmung Fassade</label><div class="input-wrap"><input type="number" id="fassade" value="80000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Fenster / Türen</label><div class="input-wrap"><input type="number" id="fenster" value="60000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Heizungsanlage</label><div class="input-wrap"><input type="number" id="heizung" value="55000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Lüftung / WRG</label><div class="input-wrap"><input type="number" id="lueftung" value="20000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>PV-Anlage</label><div class="input-wrap"><input type="number" id="pv" value="30000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Sonstige</label><div class="input-wrap"><input type="number" id="sonstige" value="10000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
           <div class="field"><label>Nebenkosten <span class="unit">%</span></label><input type="number" id="nk" value="12" onchange="calc()"></div>
         </div>
         <div class="section-label">Energetische Kennwerte</div>
         <div class="fields-4">
           <div class="field"><label>Verbrauch vorher <span class="unit">kWh/m²a</span></label><input type="number" id="vorher" value="180" onchange="calc()"></div>
           <div class="field"><label>Verbrauch nachher <span class="unit">kWh/m²a</span></label><input type="number" id="nachher" value="55" onchange="calc()"></div>
-          <div class="field"><label>Energiepreis <span class="unit">€/kWh</span></label><input type="number" id="epreis" value="0.12" step="0.01" onchange="calc()"></div>
+          <div class="field"><label>Energiepreis <span class="unit">€/kWh</span></label><input type="number" id="epreis" value="0,12" step="0.01" onchange="calc()"></div>
           <div class="field"><label>Energiepreissteigerung <span class="unit">%/a</span></label><input type="number" id="estieg" value="3" onchange="calc()"></div>
         </div>
       </div>
@@ -265,21 +384,21 @@ canvas{max-width:100%;display:block}
       <div class="panel-head">Finanzierung & Förderung</div>
       <div class="panel-body">
         <div class="fields-4">
-          <div class="field"><label>Eigenkapital <span class="unit">€</span></label><input type="number" id="ek" value="100000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Zinssatz <span class="unit">%</span></label><input type="number" id="zins" value="3.5" step="0.1" onchange="calc()"></div>
+          <div class="field"><label>Eigenkapital</label><div class="input-wrap"><input type="number" id="ek" value="100000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Zinssatz <span class="unit">%</span></label><input type="number" id="zins" value="3,5" step="0.1" onchange="calc()"></div>
           <div class="field"><label>Tilgung <span class="unit">%/a</span></label><input type="number" id="tilgung" value="2" step="0.5" onchange="calc()"></div>
           <div class="field"><label>Laufzeit <span class="unit">Jahre</span></label><input type="number" id="laufzeit" value="20" onchange="calc()"></div>
         </div>
         <div class="section-label">KfW / BAFA Förderung</div>
         <div class="fields-4">
           <div class="field"><label>KfW-Zuschuss <span class="unit">%</span></label><input type="number" id="kfw" value="20" onchange="calc()"></div>
-          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="bafa" value="5000" onchange="calc()" step="1000"></div>
-          <div class="field"><label>Zinsvergünstigung <span class="unit">%</span></label><input type="number" id="zinsv" value="1.0" step="0.1" onchange="calc()"></div>
+          <div class="field"><label>BAFA</label><div class="input-wrap"><input type="number" id="bafa" value="5000" onchange="calc()" step="1000"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Zinsvergünstigung <span class="unit">%</span></label><input type="number" id="zinsv" value="1,0" step="0.1" onchange="calc()"></div>
           <div class="field"><label>Tilgungszuschuss <span class="unit">%</span></label><input type="number" id="tilgz" value="5" onchange="calc()"></div>
         </div>
         <div class="section-label">Mietparameter</div>
         <div class="fields-4">
-          <div class="field"><label>Kaltmiete <span class="unit">€/m²</span></label><input type="number" id="miete" value="8.50" step="0.1" onchange="calc()"></div>
+          <div class="field"><label>Kaltmiete <span class="unit">€/m²</span></label><input type="number" id="miete" value="8,50" step="0.1" onchange="calc()"></div>
           <div class="field"><label>Mietsteigerung <span class="unit">%/a</span></label><input type="number" id="mstieg" value="2" onchange="calc()"></div>
           <div class="field"><label>Diskontierungssatz <span class="unit">%</span></label><input type="number" id="diskont" value="5" step="0.5" onchange="calc()"></div>
           <div class="field"><label>Leerstand <span class="unit">%</span></label><input type="number" id="leer" value="3" onchange="calc()"></div>
@@ -323,13 +442,13 @@ canvas{max-width:100%;display:block}
         <div class="grid3">
           <div class="metric good"><div class="metric-label"><span class="tooltip-wrap">Energieeinsparung p.a.<span class="tooltip-icon">?</span><span class="tooltip-box">Jährliche Kosteneinsparung durch reduzierten Energieverbrauch. Berechnung: (Verbrauch vorher − nachher) × m² × Energiepreis €/kWh</span></span></div><div class="metric-value" id="m-einspar">--</div><div class="metric-sub" id="m-einspar-kwh">--</div><button class="acc-btn" onclick="toggleAcc('acc-einspar')">▶ Rechenweg</button><div class="acc-content" id="acc-einspar"></div></div>
           <div class="metric good"><div class="metric-label"><span class="tooltip-wrap">CO₂-Reduktion p.a.<span class="tooltip-icon">?</span><span class="tooltip-box">Tonnen CO₂ die jährlich eingespart werden. Faktor: 0,201 kg CO₂ pro kWh Endenergie (DE-Strommix).</span></span></div><div class="metric-value" id="m-co2">--</div><div class="metric-sub">Tonnen CO₂</div></div>
-          <div class="metric info"><div class="metric-label"><span class="tooltip-wrap">Mieterhöhung §559<span class="tooltip-icon">?</span><span class="tooltip-box">Nach §559 BGB dürfen Vermieter 8% der auf die Wohnung entfallenden Modernisierungskosten p.a. auf die Miete umlegen. Deckelung beachten.</span></span></div><div class="metric-value" id="m-miete559">--</div><div class="metric-sub">8% der Mod.kosten</div></div>
+          <div class="metric info"><div class="metric-label"><span class="tooltip-wrap">Mieterhöhung §559<span class="tooltip-icon">?</span><span class="tooltip-box">Nach §559 BGB: 8% der Modernisierungskosten p.a. → pro m² pro Monat. Kappung nach §559a: max. 0,50 €/m²/Monat (= 3 €/m² in 6 Jahren). Gezeigt wird der kappierte Wert.</span></span></div><div class="metric-value" id="m-miete559">--</div><div class="metric-sub">max. 0,50 €/m²/Mo. (§559a)</div></div>
           <div class="metric" id="m-amort-card"><div class="metric-label"><span class="tooltip-wrap">Amortisationszeit<span class="tooltip-icon">?</span><span class="tooltip-box">Jahr in dem die kumulierten Einsparungen (Energie + Mietmehreinnahmen) die Nettoinvestition übersteigen. Statische Methode mit Energiepreissteigerung.</span></span></div><div class="metric-value" id="m-amort">--</div><div class="metric-sub">statisch</div><button class="acc-btn" onclick="toggleAcc('acc-amort')">▶ Rechenweg</button><div class="acc-content" id="acc-amort"></div></div>
           <div class="metric" id="m-npv-card"><div class="metric-label"><span class="tooltip-wrap">Kapitalwert (NPV)<span class="tooltip-icon">?</span><span class="tooltip-box">Net Present Value: Summe aller diskontierten Cashflows abzüglich der Anfangsinvestition. Positiv = wirtschaftlich vorteilhaft.</span></span></div><div class="metric-value" id="m-npv">--</div><div class="metric-sub" id="m-npv-sub">--</div><button class="acc-btn" onclick="toggleAcc('acc-npv')">▶ Rechenweg</button><div class="acc-content" id="acc-npv"></div></div>
           <div class="metric" id="m-irr-card"><div class="metric-label"><span class="tooltip-wrap">IRR (Eigenkapital)<span class="tooltip-icon">?</span><span class="tooltip-box">Internal Rate of Return: Der Zinssatz bei dem der NPV = 0. Zeigt die Rendite auf das eingesetzte Eigenkapital. Vergleich: Alternativanlage.</span></span></div><div class="metric-value" id="m-irr">--</div><div class="metric-sub">Interne Verzinsung</div></div>
-          <div class="metric"><div class="metric-label"><span class="tooltip-wrap">Mietrendite vorher<span class="tooltip-icon">?</span><span class="tooltip-box">Bruttomietrendite = Jahreskaltmiete ÷ (Kaufpreis + Investition) × 100. Vor Modernisierung.</span></span></div><div class="metric-value" id="m-rend-vor">--</div><div class="metric-sub">brutto</div></div>
-          <div class="metric good"><div class="metric-label"><span class="tooltip-wrap">Mietrendite nachher<span class="tooltip-icon">?</span><span class="tooltip-box">Bruttomietrendite nach Modernisierung — inkl. der nach §559 BGB umlagefähigen Mieterhöhung.</span></span></div><div class="metric-value" id="m-rend-nach">--</div><div class="metric-sub">inkl. §559</div></div>
-          <div class="metric"><div class="metric-label"><span class="tooltip-wrap">Nettomietrendite<span class="tooltip-icon">?</span><span class="tooltip-box">NRR = (Jahresnettomiete − Bewirtschaftungskosten − Annuität) ÷ Eigenkapital × 100. Aussagekräftigste Renditezahl für Investoren.</span></span></div><div class="metric-value" id="m-nrr">--</div><div class="metric-sub">nach Kosten</div></div>
+          <div class="metric"><div class="metric-label"><span class="tooltip-wrap">Mietrendite vorher<span class="tooltip-icon">?</span><span class="tooltip-box">Bruttomietrendite = Jahreskaltmiete ÷ Verkehrswert × 100. Vor Modernisierung — zeigt die aktuelle Bestandsrendite.</span></span></div><div class="metric-value" id="m-rend-vor">--</div><div class="metric-sub">Miete / Verkehrswert</div></div>
+          <div class="metric good"><div class="metric-label"><span class="tooltip-wrap">Mietrendite nachher<span class="tooltip-icon">?</span><span class="tooltip-box">Bruttomietrendite nach Modernisierung = Jahreskaltmiete-Neu ÷ (Verkehrswert + Bruttokosten) × 100. Inkl. §559 BGB Mieterhöhung (kappiert auf 0,50 €/m²/Monat).</span></span></div><div class="metric-value" id="m-rend-nach">--</div><div class="metric-sub">Miete-Neu / (VKW+Invest)</div></div>
+          <div class="metric"><div class="metric-label"><span class="tooltip-wrap">Nettomietrendite<span class="tooltip-icon">?</span><span class="tooltip-box">NRR = (Jahresnettomiete − 22% Bewirtschaftung − Annuität) ÷ (Verkehrswert + Bruttokosten) × 100. Realistischste Renditekennzahl für Investoren.</span></span></div><div class="metric-value" id="m-nrr">--</div><div class="metric-sub">nach Kosten / Gesamtinvest.</div></div>
         </div>
       </div>
     </div>
@@ -414,10 +533,10 @@ canvas{max-width:100%;display:block}
               <option value="5">5% (Denkmal-AfA)</option>
             </select>
           </div>
-          <div class="field"><label>AfA-Bemessungsgrundlage <span class="unit">€</span></label><input type="number" id="afabasis" value="1200000" onchange="calcSteuer()" step="1000"></div>
-          <div class="field"><label>Sofortabzugsfähige Kosten <span class="unit">€</span></label><input type="number" id="sofort" value="0" onchange="calcSteuer()" step="1000"></div>
+          <div class="field"><label>AfA-Bemessungsgrundlage</label><div class="input-wrap"><input type="number" id="afabasis" value="1200000" onchange="calcSteuer()"><span class="input-suffix">€</span></div></div>
+          <div class="field"><label>Sofortabzugsfähige Kosten</label><div class="input-wrap"><input type="number" id="sofort" value="0" onchange="calcSteuer()"><span class="input-suffix">€</span></div></div>
           <div class="field"><label>Betrachtungszeitraum <span class="unit">Jahre</span></label><input type="number" id="steuerjahre" value="20" onchange="calcSteuer()"></div>
-          <div class="field"><label>Mieteinnahmen p.a. <span class="unit">€</span></label><input type="number" id="stmiete" value="81600" onchange="calcSteuer()" step="1000"></div>
+          <div class="field"><label>Mieteinnahmen p.a.</label><div class="input-wrap"><input type="number" id="stmiete" value="81600" onchange="calcSteuer()"><span class="input-suffix">€</span></div></div>
         </div>
         <div class="afa-info" id="afa-hinweis">AfA-Informationen werden nach Eingabe berechnet.</div>
       </div>
@@ -535,7 +654,7 @@ canvas{max-width:100%;display:block}
         <div class="section-label">Förderung</div>
         <div class="field-row">
           <div class="field"><label>KfW <span class="unit">%</span></label><input type="number" id="vA-kfw" value="25" onchange="vgl_calc()"></div>
-          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="vA-bafa" value="8000" onchange="vgl_calc()"></div>
+          <div class="field"><label>BAFA</label><input type="number" id="vA-bafa" value="8000" onchange="vgl_calc()"></div>
         </div>
       </div>
     </div>
@@ -563,7 +682,7 @@ canvas{max-width:100%;display:block}
         <div class="section-label">Förderung</div>
         <div class="field-row">
           <div class="field"><label>KfW <span class="unit">%</span></label><input type="number" id="vB-kfw" value="20" onchange="vgl_calc()"></div>
-          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="vB-bafa" value="5000" onchange="vgl_calc()"></div>
+          <div class="field"><label>BAFA</label><input type="number" id="vB-bafa" value="5000" onchange="vgl_calc()"></div>
         </div>
       </div>
     </div>
@@ -591,7 +710,7 @@ canvas{max-width:100%;display:block}
         <div class="section-label">Förderung</div>
         <div class="field-row">
           <div class="field"><label>KfW <span class="unit">%</span></label><input type="number" id="vC-kfw" value="15" onchange="vgl_calc()"></div>
-          <div class="field"><label>BAFA <span class="unit">€</span></label><input type="number" id="vC-bafa" value="3000" onchange="vgl_calc()"></div>
+          <div class="field"><label>BAFA</label><input type="number" id="vC-bafa" value="3000" onchange="vgl_calc()"></div>
         </div>
       </div>
     </div>
@@ -607,8 +726,8 @@ canvas{max-width:100%;display:block}
         <div class="field"><label>Energiepreis <span class="unit">€/kWh</span></label><input type="number" id="vgl-ep" value="0.12" step="0.01" onchange="vgl_calc()"></div>
         <div class="field"><label>Preissteigerung <span class="unit">%/a</span></label><input type="number" id="vgl-es" value="3" onchange="vgl_calc()"></div>
         <div class="field"><label>Kaltmiete <span class="unit">€/m²</span></label><input type="number" id="vgl-miete" value="8.50" step="0.1" onchange="vgl_calc()"></div>
-        <div class="field"><label>Zinssatz <span class="unit">%</span></label><input type="number" id="vgl-zins" value="3.5" step="0.1" onchange="vgl_calc()"></div>
-        <div class="field"><label>Eigenkapital <span class="unit">€</span></label><input type="number" id="vgl-ek" value="100000" onchange="vgl_calc()"></div>
+        <div class="field"><label>Zinssatz <span class="unit">%</span></label><input type="number" id="vgl-zins" value="3,5" step="0.1" onchange="vgl_calc()"></div>
+        <div class="field"><label>Eigenkapital</label><input type="number" id="vgl-ek" value="100000" onchange="vgl_calc()"></div>
         <div class="field"><label>Tilgung <span class="unit">%</span></label><input type="number" id="vgl-tilg" value="2" onchange="vgl_calc()"></div>
         <div class="field"><label>Laufzeit <span class="unit">Jahre</span></label><input type="number" id="vgl-lz" value="20" onchange="vgl_calc()"></div>
         <div class="field"><label>Nebenkosten <span class="unit">%</span></label><input type="number" id="vgl-nk" value="12" onchange="vgl_calc()"></div>
@@ -915,8 +1034,6 @@ canvas{max-width:100%;display:block}
         </div>
       </div>
     </div>
-  </div>
-</div>
 <!-- ═══════════════════ TAB 5: GEG ═══════════════════ -->
 <div id="tab-geg" class="tab-page">
   <div class="grid2c">
@@ -952,17 +1069,42 @@ canvas{max-width:100%;display:block}
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-// ── UTILS ──
 function g(id){return document.getElementById(id)}
-function v(id){return parseFloat(g(id).value)||0}
+function v(id){
+  const el=g(id); if(!el) return 0;
+  const raw=el.value||'0';
+  // DE-Format: 1.234,56 → remove thousand-dots, replace comma with dot
+  // EN-Format: 1234.56 → use as-is
+  // Heuristic: if both . and , exist, the last one is the decimal separator
+  let val=raw.trim();
+  if(val.indexOf(',')>-1 && val.indexOf('.')>-1){
+    // Has both: remove thousand separator (the one that comes first)
+    // DE: 1.234,56 → last separator is comma → thousand sep is dot
+    if(val.lastIndexOf('.')< val.lastIndexOf(',')){
+      val=val.replace(/\./g,'').replace(',','.');
+    } else {
+      // EN: 1,234.56 → remove commas
+      val=val.replace(/,/g,'');
+    }
+  } else if(val.indexOf(',')>-1){
+    // Only comma: treat as decimal separator (DE: 3,5)
+    val=val.replace(',','.');
+  }
+  // Only dot or no separator: use as-is (EN decimal: 3.5 or integer)
+  return parseFloat(val)||0;
+}
 function fmt(n,d=0){return isNaN(n)?'--':n.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d})}
 function eur(n){
   if(isNaN(n)||n===null||n===undefined)return'--';
   return n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
 }
 function pct(n,d=1){return isNaN(n)?'--':fmt(n,d).replace('.',',')+' %'}
+
+// Euro-Eingabefeld Formatierung (nicht mehr benötigt, aber als Fallback)
+function fmtEuroField(el){}
+function onEuroInput(el){}
+function onEuroBlur(el){}
 
 function effKlasse(kwh){
   if(kwh<30)return{kl:'A+',col:'#0a6147',bg:'#dff2ea'};
@@ -1008,16 +1150,33 @@ function calc(){
   const vor=v('vorher'),nach=v('nachher'),ep=v('epreis'),es=v('estieg');
   const einsparKwh=(vor-nach)*fl,einsparEur=einsparKwh*ep,co2=einsparKwh*0.201/1000;
   const miete=v('miete'),ms=v('mstieg'),leer=v('leer');
-  const mietErh=Math.min(basis*0.08/12,fl*2.5)/fl;
-  const mietNeu=miete+mietErh;
-  const mieteJahr=fl*miete*12*(1-leer/100),mieteJahrNeu=fl*mietNeu*12*(1-leer/100);
-  const diskont=v('diskont');
+  // §559 BGB Mieterhöhung — korrekt mit §559a Kappungsgrenze
+  // Max. 8% der Modernisierungskosten p.a. → pro m² pro Monat
+  // §559a: max. 3 €/m² in 6 Jahren = 0,50 €/m²/Monat Kappungsgrenze
+  const mietErh559Annual = basis * 0.08;          // €/Jahr gesamt
+  const mietErh559Monthly_m2 = mietErh559Annual / 12 / fl; // €/m²/Monat unkappiert
+  const mietErh559Cap = 0.50;                      // §559a Kappung: 0,50 €/m²/Monat
+  const mietErh = Math.min(mietErh559Monthly_m2, mietErh559Cap); // €/m²/Monat
+  const mietNeu = miete + mietErh;
+  const mieteJahr = fl * miete * 12 * (1-leer/100);
+  const mieteJahrNeu = fl * mietNeu * 12 * (1-leer/100);
+  const diskont = v('diskont');
+
+  // Mietrendite korrekt: Bezug auf Verkehrswert (Bestandsrendite)
+  // rendVor = Jahreskaltmiete / Verkehrswert (vor Invest)
+  // rendNach = Jahreskaltmiete-Neu / (Verkehrswert + Bruttoinvestition)
+  const vkwVal = v('vkw') || brutto * 3; // Fallback wenn VKW nicht eingegeben
+  const rendVor  = vkwVal > 0 ? (mieteJahr    / vkwVal) * 100 : 0;
+  const rendNach = (vkwVal + brutto) > 0 ? (mieteJahrNeu / (vkwVal + brutto)) * 100 : 0;
+
+  // Nettomietrendite: auf Gesamtinvestition (VKW + Brutto) bezogen
+  const bewirtsch = mieteJahrNeu * 0.22; // 22% Bewirtschaftungskosten (Branche: 18-25%)
+  const nrr = (vkwVal + brutto) > 0 ? ((mieteJahrNeu - bewirtsch - ann) / (vkwVal + brutto)) * 100 : 0;
+
   const amort=calcAmort(netto,einsparEur+(mieteJahrNeu-mieteJahr),es);
   const cfs=[];let es2=einsparEur,mE=mieteJahrNeu-mieteJahr;
   for(let y=1;y<=lz;y++){cfs.push(es2+mE-ann);es2*=(1+es/100);mE*=(1+ms/100);}
   const npv=calcNPV(ek,cfs,diskont),irr=calcIRR(ek,cfs);
-  const rendVor=(mieteJahr/(brutto+ek))*100,rendNach=(mieteJahrNeu/(brutto+ek))*100;
-  const bewirtsch=mieteJahrNeu*0.25,nrr=((mieteJahrNeu-bewirtsch-ann)/ek)*100;
 
   // ROI: (Gesamtnutzen - Nettoinvestition) / Nettoinvestition × 100
   // Gesamtnutzen = kumulierte Energieeinsparung + kumulierte Mietmehreinnahmen + Wertsteigerung (Vergleichswert)
@@ -1040,7 +1199,7 @@ function calc(){
   g('m-brutto').textContent=eur(brutto);g('m-foerd').textContent=eur(foerd);g('m-netto').textContent=eur(netto);
   g('m-fk').textContent=eur(fk);g('m-ann').textContent=eur(ann);g('m-qm').textContent=Math.round(brutto/fl)+' €';
   g('m-einspar').textContent=eur(einsparEur);g('m-einspar-kwh').textContent=fmt(einsparKwh,0)+' kWh/a';
-  g('m-co2').textContent=fmt(co2,1)+' t';g('m-miete559').textContent=fmt(mietErh,2).replace('.',',')+' €/m²';
+  g('m-co2').textContent=fmt(co2,1)+' t';g('m-miete559').textContent=fmt(mietErh,2).replace('.',',')+' €/m²/Mo.';
   g('m-amort').textContent=(typeof amort==='number'?amort+' J.':amort);
   g('m-npv').textContent=eur(npv);g('m-npv-sub').textContent=lz+'-Jahres-Betrachtung';
   g('m-irr').textContent=pct(irr);g('m-rend-vor').textContent=pct(rendVor);
@@ -1071,16 +1230,21 @@ function calc(){
   }).join('');
 
   calcFinanzplan();calcSteuer();calcBewertung();calcGEG();
-  validateAll();
+  validateFields();
   updateRechenweg();
+  updateAmpel();
 }
 
 // ── FINANZIERUNGSPLAN ──
 let chartTilg=null;
 function calcFinanzplan(){
-  const fk=S.fk,zins=S.zins,lz=S.lz;
+  const fk=S.fk;
+  // Zins direkt aus Feld lesen (nicht aus S, um alte Cache-Werte zu vermeiden)
+  const zins=Math.max(0.01, v('zins')-v('zinsv'));
+  const tilg=v('tilgung');
+  const lz=v('laufzeit');
   if(fk<=0){g('fp-darlehen').textContent='0 €';return;}
-  const annRate=(zins/100+v('tilgung')/100);
+  const annRate=(zins+tilg)/100;
   const ann=fk*annRate;
   let schuld=fk,gZins=0;
   const rows=[];let vollTilg=lz;
@@ -1248,8 +1412,12 @@ async function exportPDF(){
     const {jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const wl=getWL()||{};
-    const pName=g('topbar-projname')?.textContent||'Projekt';
-    const today=new Date().toLocaleDateString('de-DE');
+    const pName=g('proj-bezeichnung')?.value||g('topbar-projname')?.textContent||'Projekt';
+    const auftrg=g('proj-auftraggeber')?.value||'';
+    const bearb=g('proj-bearbeiter')?.value||'';
+    const lph=g('proj-lph')?.value||'';
+    const status=g('proj-status')?.value||'';
+    const today=g('proj-datum')?.value?new Date(g('proj-datum').value).toLocaleDateString('de-DE'):new Date().toLocaleDateString('de-DE');
     const lz=v('laufzeit')||20;
 
     // ── Farben ──
@@ -1281,12 +1449,19 @@ async function exportPDF(){
     doc.text('Wirtschaftlichkeitsrechner — Immobilien-Modernisierung',14,wl.company?35:30);
 
     // Projektinfo-Box
-    doc.setFillColor(...cLight);doc.roundedRect(14,50,182,32,3,3,'F');
+    doc.setFillColor(...cLight);doc.roundedRect(14,50,182,40,3,3,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...cGreen);
     doc.text(pName,20,60);
     doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...cGray);
     doc.text(`Gebäudetyp: ${g('typ')?.value||'–'}   ·   Wohnfläche: ${v('flaeche')} m²   ·   Baujahr: ${v('baujahr')}`,20,68);
-    doc.text(`Lage: ${g('lage')?.options[g('lage')?.selectedIndex]?.text||'–'}   ·   Einheiten: ${v('einheiten')}   ·   Erstellt: ${today}`,20,75);
+    doc.text(`Lage: ${g('lage')?.options[g('lage')?.selectedIndex]?.text||'–'}   ·   Einheiten: ${v('einheiten')}   ·   ${lph}   ·   ${status}`,20,75);
+    if(auftrg||bearb) doc.text(`Auftraggeber: ${auftrg||'–'}   ·   Bearbeiter: ${bearb||'–'}   ·   Datum: ${today}`,20,82);
+    const beschr=g('proj-beschreibung')?.value||'';
+    if(beschr){
+      doc.setFont('helvetica','italic');doc.setFontSize(8.5);doc.setTextColor(...cGray);
+      const lines=doc.splitTextToSize(beschr, 162);
+      doc.text(lines.slice(0,3), 20, 90);
+    }
 
     // ROI Highlight
     doc.setFillColor(...cGreen);doc.roundedRect(14,90,88,28,3,3,'F');
@@ -1615,24 +1790,39 @@ function getAllProjects(){
 }
 function saveAllProjects(arr){ localStorage.setItem('wirt_projects', JSON.stringify(arr)); }
 
+function updateTopbarName(){
+  const name = g('proj-bezeichnung')?.value?.trim();
+  const el = g('topbar-projname');
+  if(el) el.textContent = name || 'Neues Projekt';
+}
+
 function getProjectData(){
   return {
-    name: g('topbar-projname').textContent||'Neues Projekt',
+    name: g('proj-bezeichnung')?.value || g('topbar-projname')?.textContent || 'Neues Projekt',
     savedAt: new Date().toISOString(),
     version: APP_VERSION,
     fields: ['typ','flaeche','baujahr','einheiten','lage','vkw','dach','fassade','fenster',
       'heizung','lueftung','pv','sonstige','nk','vorher','nachher','epreis','estieg',
       'ek','zins','tilgung','laufzeit','kfw','bafa','zinsv','tilgz','miete','mstieg',
       'diskont','leer','kapzins-vor','kapzins-nach','bewirt','rnd','vgl-vor','vgl-nach',
-      'steuersatz','afasatz','afabasis','sofort','steuerjahre','stmiete']
+      'steuersatz','afasatz','afabasis','sofort','steuerjahre','stmiete',
+      'proj-bezeichnung','proj-auftraggeber','proj-bearbeiter','proj-datum','proj-lph','proj-status','proj-beschreibung','proj-notizen']
       .reduce((acc,id)=>{ const el=g(id); if(el) acc[id]=(el.tagName==='SELECT'?el.value:el.value); return acc; }, {})
   };
 }
 
 function loadProjectData(proj){
   if(!proj||!proj.fields) return;
-  Object.entries(proj.fields).forEach(([id,val])=>{ const el=g(id); if(el) el.value=val; });
+  const euroIds=['dach','fassade','fenster','heizung','lueftung','pv','sonstige','ek','bafa','vkw','afabasis','sofort','stmiete'];
+  Object.entries(proj.fields).forEach(([id,val])=>{
+    const el=g(id);
+    if(!el) return;
+    el.value=val;
+    // Reformat euro fields
+    if(euroIds.includes(id)) fmtEuroField(el);
+  });
   g('topbar-projname').textContent=proj.name||'Projekt';
+  updateTopbarName();
   calc();
 }
 
@@ -1780,6 +1970,11 @@ function appInit(){
   const savedWL = getWL();
   if(savedWL) { applyWLToApp(savedWL); loadWLToForm(savedWL); }
   setLanguage(currentLang);
+  // Datum vorbelegen
+  const datumEl = g('proj-datum');
+  if(datumEl && !datumEl.value) datumEl.value = new Date().toISOString().slice(0,10);
+  // Autosave laden
+  setTimeout(loadAutosave, 500);
 }
 
 // Überschreibe callClaude um Key + Model aus Settings zu nutzen
@@ -1796,10 +1991,7 @@ async function callClaude(systemPrompt, userMessage){
   const data=await response.json();
   return data.content?.[0]?.text||'Keine Antwort erhalten.';
 }
-const script=document.createElement('script');
-script.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-script.onload=()=>calc();
-document.head.appendChild(script);
+// Chart.js loaded at end of script
 
 // ── KI HELPERS ──
 function buildProjectContext(){
@@ -2545,6 +2737,236 @@ function vgl_reset(){
   });
   vgl_calc();
 }
+// ── ZUSAMMENFASSUNGS-SHEET (1 Seite A4) ──
+function exportSummarySheet(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const wl=getWL()||{};
+  const pName=g('proj-bezeichnung')?.value||g('topbar-projname')?.textContent||'Projekt';
+  const auftrg=g('proj-auftraggeber')?.value||'';
+  const today=g('proj-datum')?.value?new Date(g('proj-datum').value).toLocaleDateString('de-DE'):new Date().toLocaleDateString('de-DE');
+
+  const cG=[10,97,71],cB=[20,88,160],cD=[26,26,23],cGr=[92,92,86],cL=[240,239,233];
+  const W=210;
+
+  // Header
+  doc.setFillColor(...cG);doc.rect(0,0,W,28,'F');
+  doc.setFillColor(...cB);doc.rect(0,25,W,3,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(200,240,220);
+  doc.text(wl.company||'SMART CapEx · BuiltSmart Hub',14,11);
+  doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(255,255,255);
+  doc.text('Wirtschaftlichkeits-Zusammenfassung',14,21);
+
+  // Projektinfo
+  doc.setFillColor(...cL);doc.rect(0,28,W,14,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...cD);
+  doc.text(pName,14,36);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...cGr);
+  const meta=`${g('typ')?.value||''} · ${v('flaeche')} m² · Baujahr ${v('baujahr')} · ${g('lage')?.options[g('lage')?.selectedIndex]?.text||''}${auftrg?' · '+auftrg:''}`;
+  doc.text(meta,14,42);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);
+  doc.text('Erstellt: '+today,W-14,42,{align:'right'});
+
+  // KPI-Boxen 3x2
+  const kpis=[
+    {l:'ROI',v:g('m-roi')?.textContent||'–',s:'Gesamtrendite',c:cG},
+    {l:'Amortisation',v:g('m-amort')?.textContent||'–',s:'Statisch',c:cB},
+    {l:'Kapitalwert (NPV)',v:g('m-npv')?.textContent||'–',s:v('laufzeit')+'-Jahres-Betrachtung',c:cD},
+    {l:'Energieeinsparung p.a.',v:g('m-einspar')?.textContent||'–',s:g('m-einspar-kwh')?.textContent||'',c:cG},
+    {l:'CO₂-Reduktion p.a.',v:(g('m-co2')?.textContent||'–')+' t',s:'Tonnen/Jahr',c:cB},
+    {l:'IRR (Eigenkapitalrendite)',v:g('m-irr')?.textContent||'–',s:'Interne Verzinsung',c:cD},
+  ];
+  const bW=57,bH=20,bGap=3.5;
+  kpis.forEach((k,i)=>{
+    const col=i%3,row=Math.floor(i/3);
+    const x=14+col*(bW+bGap),y=48+row*(bH+3);
+    doc.setFillColor(k.c[0],k.c[1],k.c[2]);
+    doc.roundedRect(x,y,bW,bH,2,2,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(255,255,255);doc.setGState(doc.GState({opacity:.8}));
+    doc.text(k.l,x+3,y+5);
+    doc.setGState(doc.GState({opacity:1}));
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(255,255,255);
+    doc.text(String(k.v),x+3,y+14);
+  });
+
+  // Investitionsübersicht
+  let y=100;
+  const sH=(txt,yy,c=cG)=>{doc.setFillColor(...c);doc.rect(14,yy-3.5,182,6,'F');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(255,255,255);doc.text(txt,16,yy);return yy+8;};
+  const row=(k,vl,yy,bold=false)=>{doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(8.5);doc.setTextColor(...cGr);doc.text(k,18,yy);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...cD);doc.text(String(vl),195,yy,{align:'right'});doc.setDrawColor(...cL);doc.setLineWidth(0.3);doc.line(14,yy+1.5,196,yy+1.5);return yy+6;};
+
+  y=sH('INVESTITION',y);
+  y=row('Bruttokosten',g('m-brutto')?.textContent||'–',y);
+  y=row('Förderungen gesamt',g('m-foerd')?.textContent||'–',y);
+  y=row('Nettoinvestition',g('m-netto')?.textContent||'–',y,true);
+  y=row('Eigenkapital',eur(v('ek')),y);
+  y=row('Fremdkapital / Annuität p.a.',`${g('m-fk')?.textContent||'–'} / ${g('m-ann')?.textContent||'–'}`,y);
+
+  y+=2;y=sH('ENERGETIK & EINSPARUNG',y,cB);
+  y=row('Verbrauch vorher / nachher',`${v('vorher')} / ${v('nachher')} kWh/m²a`,y);
+  y=row('Einsparung',Math.round((1-v('nachher')/v('vorher'))*100)+' %',y);
+  y=row('Energiekosten-Einsparung p.a.',g('m-einspar')?.textContent||'–',y);
+  y=row('CO₂-Reduktion p.a.',(g('m-co2')?.textContent||'–')+' t/a',y);
+  const effV=effKlasse(v('vorher')),effN=effKlasse(v('nachher'));
+  y=row('Effizienzklasse',`${effV.kl} → ${effN.kl}`,y);
+
+  y+=2;y=sH('WIRTSCHAFTLICHKEIT',y,cD);
+  y=row('Mieterhöhung §559 BGB',g('m-miete559')?.textContent||'–'+'/m²',y);
+  y=row('Mietrendite vorher / nachher',`${g('m-rend-vor')?.textContent||'–'} / ${g('m-rend-nach')?.textContent||'–'}`,y);
+  y=row('Nettomietrendite',g('m-nrr')?.textContent||'–',y);
+
+  // Footer
+  doc.setFillColor(...cL);doc.rect(0,278,W,19,'F');
+  doc.setDrawColor(...cG);doc.setLineWidth(0.5);doc.line(0,278,W,278);
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(...cGr);
+  doc.text('Diese Zusammenfassung dient der Orientierung und ersetzt keine fachliche Beratung.',14,284);
+  doc.text(wl.footer||'© BuiltSmart Hub · SMART CapEx · www.built-smart-hub.com',W/2,290,{align:'center'});
+
+  doc.save(pName.replace(/[^a-zA-Z0-9äöüÄÖÜ\-_ ]/g,'_')+'_Zusammenfassung.pdf');
+}
+
+// ── ERWEITERTE VALIDIERUNG: Inline-Warnungen ──
+const REQUIRED_FIELDS=[
+  {id:'flaeche',label:'Wohnfläche',min:10,max:50000},
+  {id:'vorher',label:'Verbrauch vorher',min:20,max:600},
+  {id:'nachher',label:'Verbrauch nachher',min:1,max:400},
+  {id:'epreis',label:'Energiepreis',min:0.05,max:1.5},
+  {id:'zins',label:'Zinssatz',min:0.1,max:25},
+  {id:'laufzeit',label:'Laufzeit',min:1,max:40},
+];
+
+function showFieldError(id,msg,type='error'){
+  const el=g(id); if(!el) return;
+  // Hint INNERHALB des .field-Containers anfügen (nicht danach)
+  const container=el.closest('.field')||el.parentNode;
+  let hint=g('hint-'+id);
+  if(!hint){
+    hint=document.createElement('div');
+    hint.id='hint-'+id;
+    hint.style.cssText='font-size:11px;padding:3px 7px;border-radius:4px;margin-top:3px;display:none;clear:both';
+    container.appendChild(hint);
+  }
+  const icon=type==='error'?'⚠ ':'! ';
+  hint.textContent=icon+msg;
+  hint.style.color=type==='error'?'var(--red)':'var(--amber)';
+  hint.style.background=type==='error'?'var(--red-bg)':'var(--amber-bg)';
+  hint.style.display='block';
+  el.style.borderColor=type==='error'?'var(--red)':'var(--amber)';
+}
+function clearFieldError(id){
+  const hint=g('hint-'+id);if(hint)hint.style.display='none';
+  const el=g(id);if(el)el.style.borderColor='';
+}
+
+function validateFields(){
+  let hasError=false;
+  // Nur wirklich kritische Fehler anzeigen — keine Bereichswarnungen
+  REQUIRED_FIELDS.forEach(f=>{
+    const el=g(f.id);
+    if(!el) return;
+    const fieldHasValue=el.value!==''&&el.value!==null;
+    if(f.id==='flaeche'&&(!fieldHasValue||v(f.id)===0)){
+      showFieldError(f.id,'Pflichtfeld — bitte ausfüllen');hasError=true;
+    } else {
+      clearFieldError(f.id);
+    }
+  });
+  // Logikfehler: Nachher >= Vorher
+  if(v('nachher')>0&&v('vorher')>0&&v('nachher')>=v('vorher')){
+    showFieldError('nachher','Muss kleiner als "Verbrauch vorher" sein','error');
+    hasError=true;
+  }
+  const banner=g('validation-banner');
+  if(banner) banner.style.display=hasError?'block':'none';
+  return !hasError;
+}
+
+// ══════════════════════════════════════════
+// NEUE FEATURES: AMPEL, AUTOSAVE, RESET, HILFE
+// ══════════════════════════════════════════
+
+// ── KENNZAHLEN-AMPEL ──
+function updateAmpel(){
+  const banner=g('ampel-banner'); if(!banner) return;
+  const roi=parseFloat((g('m-roi')?.textContent||'0').replace(/[^0-9,\-]/g,'').replace(',','.'));
+  const amortEl=g('m-amort')?.textContent||'';
+  const amort=parseInt(amortEl)||99;
+  const npvEl=g('m-npv')?.textContent||'';
+  const npvNeg=npvEl.includes('-');
+
+  let cls='ampel-amber', icon='🟡', title='Wirtschaftlichkeit prüfenswert', desc='';
+  if(S.netto && S.netto>0){
+    if(roi>80 && amort<=15 && !npvNeg){
+      cls='ampel-green'; icon='🟢'; title='Wirtschaftlich attraktiv';
+      desc=`ROI ${g('m-roi')?.textContent||'–'} · Amortisation ${amortEl} · NPV positiv`;
+    } else if(roi<20 || amort>25 || npvNeg){
+      cls='ampel-red'; icon='🔴'; title='Wirtschaftlichkeit kritisch';
+      desc=`Prüfen: ${npvNeg?'Negativer Kapitalwert · ':''}${amort>25?'Lange Amortisation · ':''}${roi<20?'Niedriger ROI':''}`;
+    } else {
+      desc=`ROI ${g('m-roi')?.textContent||'–'} · Amortisation ${amortEl}`;
+    }
+    banner.className=cls;
+    banner.style.display='flex';
+  } else {
+    banner.style.display='none';
+    return;
+  }
+  g('ampel-icon').textContent=icon;
+  g('ampel-title').textContent=title;
+  g('ampel-desc').textContent=desc;
+}
+
+// ── AUTOSAVE ──
+let _autosaveTimer=null;
+function triggerAutosave(){
+  clearTimeout(_autosaveTimer);
+  _autosaveTimer=setTimeout(()=>{
+    if(!isTrialLimited()||getTrialProjectCount()<TRIAL_MAX_PROJECTS){
+      const data=getProjectData();
+      localStorage.setItem('wirt_autosave',JSON.stringify(data));
+      const ind=g('autosave-indicator');
+      if(ind){ind.classList.add('show');setTimeout(()=>ind.classList.remove('show'),2000);}
+    }
+  },3000);
+}
+function loadAutosave(){
+  try{
+    const saved=localStorage.getItem('wirt_autosave');
+    if(!saved) return;
+    const data=JSON.parse(saved);
+    if(data&&data.fields&&confirm('Zuletzt nicht gespeicherte Eingaben gefunden. Wiederherstellen?')){
+      loadProjectData(data);
+    }
+  }catch(e){}
+}
+
+// ── RESET ──
+function resetProject(){
+  if(!confirm('Alle Eingaben zurücksetzen? Das aktuelle Projekt geht verloren.')) return;
+  const defaults={
+    flaeche:800,baujahr:1975,einheiten:10,
+    dach:45000,fassade:80000,fenster:60000,heizung:55000,lueftung:20000,pv:30000,sonstige:10000,nk:12,
+    vorher:180,nachher:55,epreis:0.12,estieg:3,
+    ek:100000,zins:3.5,tilgung:2,laufzeit:20,kfw:20,bafa:5000,zinsv:1,tilgz:5,
+    miete:8.5,mstieg:2,diskont:5,leer:3,vkw:1200000
+  };
+  Object.entries(defaults).forEach(([id,val])=>{const el=g(id);if(el)el.value=val;});
+  ['proj-bezeichnung','proj-auftraggeber','proj-bearbeiter','proj-notizen','proj-beschreibung'].forEach(id=>{const el=g(id);if(el)el.value='';});
+  g('topbar-projname').textContent='Neues Projekt';
+  calc();
+}
+
+// ── HILFE TOGGLE ──
+function toggleHilfe(id){
+  const el=g(id); if(!el) return;
+  el.classList.toggle('open');
+  const head=el.previousElementSibling;
+  if(head){const span=head.querySelector('span');if(span)span.textContent=el.classList.contains('open')?'▲':'▼';}
+}
+
+// ── AUTOSAVE bei jeder Eingabe ──
+document.addEventListener('input', triggerAutosave);
+document.addEventListener('change', triggerAutosave);
+
 const script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
 script.onload=()=>{
@@ -2556,5 +2978,171 @@ script.onload=()=>{
 };
 document.head.appendChild(script);
 </script>
+<!-- ═══════════════════ TAB: HILFE ═══════════════════ -->
+<div id="tab-hilfe" class="tab-page">
+
+  <!-- KENNZAHLEN-AMPEL -->
+  <div id="ampel-banner" style="display:none;padding:14px 18px;border-radius:var(--r);margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="font-size:28px" id="ampel-icon">🟡</div>
+    <div>
+      <div style="font-size:14px;font-weight:600" id="ampel-title">Wirtschaftlichkeit wird berechnet</div>
+      <div style="font-size:12px;margin-top:2px" id="ampel-desc">Bitte Eingaben vervollständigen</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px" id="ampel-kpis"></div>
+  </div>
+
+  <div class="grid2c">
+    <div style="display:flex;flex-direction:column;gap:var(--gap)">
+
+      <div class="panel">
+        <div class="panel-head" style="background:var(--green);color:#fff">Schnellstart — In 5 Schritten zur Berechnung</div>
+        <div class="panel-body">
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid var(--border);align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">1</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Projektangaben & Objektdaten eingeben</div><div style="font-size:12px;color:var(--text2);line-height:1.6">Geben Sie Projektbezeichnung, Gebäudetyp, Wohnfläche, Baujahr und Lage ein. Diese Grunddaten bilden die Basis aller Berechnungen.</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid var(--border);align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">2</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Modernisierungsmaßnahmen erfassen</div><div style="font-size:12px;color:var(--text2);line-height:1.6">Tragen Sie die geplanten Kosten je Maßnahme ein (Dach, Fassade, Fenster, Heizung, Lüftung, PV). Nur befüllte Felder fließen in die Berechnung ein.</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid var(--border);align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">3</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Energetische Kennwerte eingeben</div><div style="font-size:12px;color:var(--text2);line-height:1.6">Verbrauch vorher und nachher in kWh/m²a (aus Energieausweis oder Planung). Der Energiepreis beeinflusst die jährliche Einsparung direkt.</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid var(--border);align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">4</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Finanzierung & Förderung erfassen</div><div style="font-size:12px;color:var(--text2);line-height:1.6">Eigenkapital, Zinssatz, Tilgung und Laufzeit eingeben. KfW-Zuschuss und BAFA werden automatisch von der Investition abgezogen.</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0;align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">5</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">„Wirtschaftlichkeit berechnen" klicken</div><div style="font-size:12px;color:var(--text2);line-height:1.6">Alle Kennzahlen (ROI, NPV, IRR, Amortisation etc.) werden sofort berechnet. Nutzen Sie dann die weiteren Tabs für Finanzierungsplan, Steuer, GEG und KI-Analyse.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Kennzahlen erklärt</div>
+        <div class="panel-body">
+          <div id="kennzahlen-list">
+            <div class="hilfe-kz" onclick="toggleHilfe('h-roi')">
+              <div class="hilfe-kz-head"><strong>ROI — Return on Investment</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="h-roi">Gesamtrendite der Investition über den Betrachtungszeitraum. Formel: (Gesamtnutzen − Investition) / Investition × 100. Gesamtnutzen = Energieeinsparung + Mietmehreinnahmen + Wertsteigerung. <strong>Gut: über 80 % · Kritisch: unter 20 %</strong></div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('h-amort')">
+              <div class="hilfe-kz-head"><strong>Amortisationszeit</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="h-amort">Das Jahr, in dem die kumulierten Einsparungen die Nettoinvestition übersteigen. Statische Methode mit Energiepreissteigerung. <strong>Gut: unter 15 Jahre · Kritisch: über 25 Jahre</strong></div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('h-npv')">
+              <div class="hilfe-kz-head"><strong>Kapitalwert (NPV)</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="h-npv">Net Present Value: Summe aller auf heute abgezinsten Cashflows minus Anfangsinvestition. Positiv = Investition lohnt sich. Formel: NPV = Σ CFt/(1+r)^t − I₀. Der Diskontierungssatz (Standard 5%) berücksichtigt den Zeitwert des Geldes.</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('h-irr')">
+              <div class="hilfe-kz-head"><strong>IRR — Interne Verzinsung</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="h-irr">Der Zinssatz bei dem der NPV = 0 wird. Zeigt die Eigenkapitalrendite. Vergleich: IRR > Alternativanlage = Investition lohnt sich. <strong>Gut: über 6 % · Akzeptabel: 3–6 % · Kritisch: unter 3 %</strong></div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('h-559')">
+              <div class="hilfe-kz-head"><strong>Mieterhöhung §559 BGB</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="h-559">Vermieter dürfen 8% der auf die Wohnung entfallenden Modernisierungskosten p.a. auf die Miete umlegen. Wichtig: Kappungsgrenze beachten (max. 3 €/m² in 6 Jahren). Dieser Wert zeigt die maximale monatliche Erhöhung pro m².</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('h-ew')">
+              <div class="hilfe-kz-head"><strong>Ertragswert</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="h-ew">Immobilienwert auf Basis der Mieteinnahmen. Formel: Reinertrag / Kapitalisierungszins. Reinertrag = Jahreskaltmiete × (1 − Bewirtschaftungskosten). Typische Kapitalisierungszinsen: A-Städte 2–3%, B-Städte 3–5%, Ländlich 5–8%.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:var(--gap)">
+
+      <div class="panel">
+        <div class="panel-head">Tab-Übersicht</div>
+        <div class="panel-body">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="padding:10px 12px;background:var(--green-bg);border-radius:var(--r);border-left:3px solid var(--green)">
+              <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:3px">Eingabe & Ergebnisse</div>
+              <div style="font-size:12px;color:var(--text2)">Haupteingabe aller Parameter + sofortige Ergebnisanzeige mit KPI-Karten, Cashflow und Sensitivitätsanalyse</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--blue-bg);border-radius:var(--r);border-left:3px solid var(--blue)">
+              <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:3px">Finanzierungsplan</div>
+              <div style="font-size:12px;color:var(--text2)">Vollständiger Tilgungsplan mit Jahrestabelle, Zins-/Schuldenverlauf und Gesamtbelastungsübersicht</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--surface2);border-radius:var(--r);border-left:3px solid var(--border2)">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Steuerliche Betrachtung</div>
+              <div style="font-size:12px;color:var(--text2)">AfA-Berechnung, Werbungskostenabzug (Schuldzinsen), Steuerersparnis p.a. und über die Laufzeit</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--surface2);border-radius:var(--r);border-left:3px solid var(--border2)">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">Objektbewertung</div>
+              <div style="font-size:12px;color:var(--text2)">Ertragswert- und Vergleichswertmethode, Wertsteigerung, Hebeleffekt und EK-Rendite auf die Wertsteigerung</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--surface2);border-radius:var(--r);border-left:3px solid var(--border2)">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">GEG-Konformität</div>
+              <div style="font-size:12px;color:var(--text2)">Prüfung GEG 2024-Anforderungen, Effizienzhaus-Standard-Erreichung, CO₂-Bepreisung bis 2030</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--amber-bg);border-radius:var(--r);border-left:3px solid var(--amber)">
+              <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:3px">⇄ Variantenvergleich</div>
+              <div style="font-size:12px;color:var(--text2)">Bis zu 3 Modernisierungsvarianten nebeneinander vergleichen — alle Kennzahlen, Gewinner-Highlighting</div>
+            </div>
+            <div style="padding:10px 12px;background:linear-gradient(135deg,#dff2ea,#e3eef9);border-radius:var(--r);border-left:3px solid var(--green)">
+              <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:3px">✦ KI-Analyse</div>
+              <div style="font-size:12px;color:var(--text2)">KI erklärt Ergebnisse, empfiehlt optimale Maßnahmen und beantwortet individuelle Fragen (API-Key erforderlich)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Häufige Fragen (FAQ)</div>
+        <div class="panel-body">
+          <div id="faq-list">
+            <div class="hilfe-kz" onclick="toggleHilfe('faq1')">
+              <div class="hilfe-kz-head"><strong>Warum zeigt die KI-Analyse einen Fehler?</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="faq1">Die KI-Analyse benötigt einen Anthropic API-Key. Gehen Sie zu Einstellungen → API-Schlüssel, tragen Sie Ihren Key ein und klicken Sie auf „API-Key speichern". Einen Key erhalten Sie unter console.anthropic.com.</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('faq2')">
+              <div class="hilfe-kz-head"><strong>Wie speichere ich mein Projekt?</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="faq2">Klicken Sie oben auf 💾. Vergeben Sie einen Projektnamen. Das Projekt wird lokal im Browser gespeichert. Über „Alle exportieren" in Einstellungen können Sie eine Sicherungskopie als .json-Datei herunterladen.</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('faq3')">
+              <div class="hilfe-kz-head"><strong>Was bedeutet „Trial — 1/3 Projekte"?</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="faq3">In der kostenlosen Testphase können bis zu 3 Projekte gespeichert werden. Mit einer Vollizenz (ab 189 €/Jahr) entfällt diese Beschränkung. Den Lizenzschlüssel geben Sie beim Start oder unter Einstellungen ein.</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('faq4')">
+              <div class="hilfe-kz-head"><strong>Woher bekomme ich den Energieverbrauch?</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="faq4">Den aktuellen Verbrauch finden Sie im Energieausweis des Gebäudes (Endenergiebedarf oder -verbrauch in kWh/m²a). Den Wert nach Sanierung liefert ein Energieberater oder eine Energiebilanzierung nach DIN 18599.</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('faq5')">
+              <div class="hilfe-kz-head"><strong>Wie nutze ich den Variantenvergleich?</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="faq5">Im Tab „⇄ Vergleich" können Sie 3 Varianten direkt eingeben. Alternativ: Klicken Sie auf „Aktuelle Eingabe als Variante A übernehmen" um die Haupteingabe zu übertragen, und geben Sie dann Variante B und C manuell ein.</div>
+            </div>
+            <div class="hilfe-kz" onclick="toggleHilfe('faq6')">
+              <div class="hilfe-kz-head"><strong>Sind die GEG-Anforderungen verbindlich?</strong><span>▼</span></div>
+              <div class="hilfe-kz-body" id="faq6">Nein — die GEG-Auswertung in SMART CapEx sind Orientierungswerte auf Basis der eingegebenen Verbrauchsdaten. Eine normkonforme GEG-Prüfung erfordert eine vollständige Energiebilanzierung durch einen zugelassenen Energieberater.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">Support & Kontakt</div>
+        <div class="panel-body">
+          <div style="font-size:13px;color:var(--text2);line-height:1.8">
+            <div style="margin-bottom:8px"><strong style="color:var(--text)">BuiltSmart Hub</strong></div>
+            <div>🌐 <a href="https://www.built-smart-hub.com" target="_blank" style="color:var(--blue)">www.built-smart-hub.com</a></div>
+            <div>📧 <a href="mailto:info@built-smart-hub.com" style="color:var(--blue)">info@built-smart-hub.com</a></div>
+            <div style="margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--r);font-size:12px">
+              <strong>Rechtlicher Hinweis:</strong> SMART CapEx dient der Orientierung und ersetzt keine fachliche Beratung durch Architekten, Energieberater, Steuerberater oder Rechtsanwälte. Alle Berechnungen ohne Gewähr.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
